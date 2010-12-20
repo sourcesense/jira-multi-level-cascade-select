@@ -1,0 +1,25 @@
+10-12-09 01:28:16,013 [main] Starting read of logfile /Users/developer/workspacejava/cascadeSelect4/./tmlog46.log
+10-12-09 01:28:16,014 [main] Done read of logfile
+10-12-09 01:28:16,056 [main] USING com.atomikos.icatch.soap_commit_protocols = atomikos,wsat
+10-12-09 01:28:16,056 [main] USING com.atomikos.icatch.console_file_name = tm.out
+10-12-09 01:28:16,056 [main] USING com.atomikos.icatch.console_file_count = 1
+10-12-09 01:28:16,056 [main] USING com.atomikos.icatch.automatic_resource_registration = true
+10-12-09 01:28:16,056 [main] USING com.atomikos.icatch.client_demarcation = false
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.soap_request_threads = 1
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.threaded_2pc = true
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.soap_host_address = 192.168.1.101
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.serial_jta_transactions = true
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.log_base_dir = ./
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.console_log_level = WARN
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.max_actives = 50
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.soap_port = 8088
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.checkpoint_interval = 500
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.enable_logging = true
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.output_dir = ./
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.log_base_name = tmlog
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.console_file_limit = -1
+10-12-09 01:28:16,057 [main] USING com.atomikos.icatch.max_timeout = 300000
+10-12-09 01:28:16,057 [main] USING java.naming.factory.initial = com.sun.jndi.rmi.registry.RegistryContextFactory
+10-12-09 01:28:16,058 [main] USING com.atomikos.icatch.tm_unique_name = 192.168.1.101.tm
+10-12-09 01:28:16,058 [main] USING java.naming.provider.url = rmi://localhost:1099
+10-12-09 01:28:16,058 [main] USING com.atomikos.icatch.service = com.atomikos.icatch.standalone.UserTransactionServiceFactory

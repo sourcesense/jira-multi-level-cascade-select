@@ -1,0 +1,84 @@
+#if (!$request || !$request.getAttribute("multilevelcascade"))
+$!request.setAttribute("multilevelcascade" , "true")
+## @TODO Somewhat of a hack should move when fields is refactored.
+    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/cascadingUtil.js"></script>
+    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/multilevelcascadingUtil.js"></script>
+    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/jquery-1.3.2.min.js"></script>
+#end
+
+#searcherEditHeader ($customField.id $customField.name)
+
+## #set ($selectedParent = "")
+## #if ($value.getValuesForKey(null) && !$value.getValuesForKey(null).empty)
+##     #set ($selectedParent = $value.getValuesForKey(null).iterator().next())
+## #end
+##
+## #set ($selectedChild = "")
+## #if ($value.getValuesForKey('1') && !$value.getValuesForKey('1').empty)
+##     #set ($selectedChild = $value.getValuesForKey('1').iterator().next())
+## #end
+
+#macro(renderSelect $key $customfieldid $levels)
+    #if ($levels.get($key))
+        #set ($parentMap = $levels.get($key))
+        <select name="$customfieldid:$key" id="$customfieldid:$key">
+        #if (!$fieldLayoutItem.required)
+            #foreach ($parentid in $parentMap.keySet())
+                <option class="$parentid" value="-1">$i18n.getText("common.words.pleaseselect")</option>
+            #end
+            <option class="select" value="-1">$i18n.getText("common.filters.any")</option>
+        #end
+        #foreach ($parentid in $parentMap.keySet())
+            #if ($parentMap.get($parentid))
+                #foreach ($option in $parentMap.get($parentid))
+                    <option class="$parentid" value="$option.optionId">$option.value</option>
+                #end
+            #end
+        #end
+        </select>
+    #end
+#end
+
+#if ($customList.get(null))
+    <select name="${customField.id}" id="${customField.id}">
+        #if (!$fieldLayoutItem.required)
+            <option value="-1">$i18n.getText("common.words.pleaseselect")</option>
+            <option value="-1">$i18n.getText("common.filters.any")</option>
+        #end
+        #set ($rootMap = $customList.get(null))
+        #foreach ($option in $rootMap.get(null))
+            <option value="$option.optionId">$option.value</option>
+        #end
+    </select>
+
+    #foreach($id in [1..10])
+        #set($key = $id.toString())
+        #if ($customList.get($key))
+            #renderSelect ($key ${customField.id} $customList)
+            #if ($id > 1)
+                #set ($script = "$!script dynamicMultiLevelSelect('${customField.id}\\:$prevkey', '${customField.id}\\:$key');")
+            #end
+        #end
+        #set ($prevkey = $key)
+    #end
+#end
+
+#searcherEditFooter ($customField.id $customField.description)
+
+<script>
+    dynamicMultiLevelSelect('${customField.id}', '${customField.id}\\:1');
+    $!script
+#if ($value.getValuesForKey(null) && !$value.getValuesForKey(null).empty)
+    #set ($selectedParent = $value.getValuesForKey(null).iterator().next())
+    selectOption("select#${customField.id}", $selectedParent);
+    #foreach($id in [1..10])
+        #set($key = $id.toString())
+        #if ($value.getValuesForKey($key) && !$value.getValuesForKey($key).empty)
+            #set ($selectedChild = $value.getValuesForKey($key).iterator().next())
+            selectOption("select#${customField.id}\\:$!key", $selectedChild);
+        #end
+    #end
+#else
+    clickFirstVisible("select#${customField.id}");
+#end
+</script>
