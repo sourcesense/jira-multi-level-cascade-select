@@ -2,9 +2,6 @@ package com.sourcesense.jira.customfield.searcher;
 
 import static com.atlassian.jira.util.dbc.Assertions.notNull;
 
-import com.sourcesense.jira.customfield.statistic.MultiLevelCascadingSelectStatisticsMapper;
-
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,6 +26,7 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.index.indexers.FieldIndexer;
 import com.atlassian.jira.issue.search.ClauseNames;
 import com.atlassian.jira.issue.search.SearchContext;
+import com.atlassian.jira.issue.search.searchers.impl.AbstractInitializationSearcher;
 import com.atlassian.jira.issue.search.searchers.information.SearcherInformation;
 import com.atlassian.jira.issue.search.searchers.renderer.SearchRenderer;
 import com.atlassian.jira.issue.search.searchers.transformer.SearchInputTransformer;
@@ -42,12 +40,12 @@ import com.atlassian.jira.jql.query.ClauseQueryFactory;
 import com.atlassian.jira.jql.query.ValidatingDecoratorQueryFactory;
 import com.atlassian.jira.jql.util.JqlCascadingSelectLiteralUtil;
 import com.atlassian.jira.jql.util.JqlSelectOptionsUtil;
-import com.atlassian.jira.jql.validator.CascadingSelectCustomFieldValidator;
 import com.atlassian.jira.jql.validator.OperatorUsageValidator;
 import com.atlassian.jira.util.ComponentFactory;
 import com.atlassian.jira.util.ComponentLocator;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.bean.FieldVisibilityBean;
+import com.sourcesense.jira.customfield.statistic.MultiLevelCascadingSelectStatisticsMapper;
 
 /**
  * This class is the main class for Multi Level Cascading Select Custom Field Searcher. It has the
@@ -56,7 +54,7 @@ import com.atlassian.jira.web.bean.FieldVisibilityBean;
  * @author Alessandro Benedetti
  * 
  */
-public class MultiLevelCascadingSelectSearcher4 extends AbstractInitializationCustomFieldSearcher implements CustomFieldSearcher,CustomFieldStattable {
+public class MultiLevelCascadingSelectSearcher4 extends /*AbstractInitializationMultiLevelSearcher*/AbstractInitializationCustomFieldSearcher implements CustomFieldSearcher,CustomFieldStattable {
 
   private volatile CustomFieldSearcherInformation searcherInformation;
 
@@ -67,7 +65,7 @@ public class MultiLevelCascadingSelectSearcher4 extends AbstractInitializationCu
   private volatile CustomFieldSearcherClauseHandler customFieldSearcherClauseHandler;
 
   private final ComponentLocator componentLocator;
-
+ 
   private final ComponentFactory componentFactory;
   private OptionsManager optionsManager;
 
@@ -92,7 +90,7 @@ public class MultiLevelCascadingSelectSearcher4 extends AbstractInitializationCu
     final QueryContextConverter queryContextConverter = componentLocator.getComponentInstanceOfType(QueryContextConverter.class);
     final CustomFieldInputHelper customFieldInputHelper = componentLocator.getComponentInstanceOfType(CustomFieldInputHelper.class);
     final OperatorUsageValidator usageValidator = componentLocator.getComponentInstanceOfType(OperatorUsageValidator.class);
-
+   // final MultiLevelCascadingSelectDescriptor descTry=new MultiLevelCascadingSelectDescriptor(getDescriptor());
     final ClauseNames names = field.getClauseNames();
     final FieldIndexer indexer = new MultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
     final CustomFieldValueProvider customFieldValueProvider = new DefaultCustomFieldValueProvider();
@@ -145,9 +143,12 @@ public class MultiLevelCascadingSelectSearcher4 extends AbstractInitializationCu
   public void populateFromParams(FieldValuesHolder fieldValuesHolder, ActionParams arg2) {
     this.searchInputTransformer.populateFromParams(null/* user? */, fieldValuesHolder, arg2);
   }
+  
 
   public StatisticsMapper getStatisticsMapper(CustomField customField) {
     return new MultiLevelCascadingSelectStatisticsMapper(customField, optionsManager);
 }
+
+ 
 
 }

@@ -21,6 +21,8 @@ import com.atlassian.jira.issue.search.ClauseNames;
 import com.atlassian.jira.issue.search.SearchContext;
 import com.atlassian.jira.issue.search.searchers.transformer.SearchInputTransformer;
 import com.atlassian.jira.issue.search.searchers.transformer.SimpleNavigatorCollectorVisitor;
+import com.atlassian.jira.issue.transport.ActionParams;
+import com.atlassian.jira.issue.transport.FieldValuesHolder;
 import com.atlassian.jira.jql.context.QueryContext;
 import com.atlassian.jira.jql.operand.JqlOperandResolver;
 import com.atlassian.jira.jql.operand.QueryLiteral;
@@ -47,7 +49,7 @@ import com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType;
  * 
  */
 @NonInjectableComponent
-public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends AbstractCustomFieldSearchInputTransformer implements SearchInputTransformer {
+public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends AbstractCustomFieldSearchInputTransformer{
   private final ClauseNames clauseNames;
 
   private final CustomField customField;
@@ -77,6 +79,18 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
 
   public boolean doRelevantClausesFitFilterForm(final User searcher, final Query query, final SearchContext searchContext) {
     return getParamsFromSearchRequest(searcher, query, searchContext) != null;
+  }
+  
+  /*this method extracts the params for the input customField, extracting them from the ActionParams obj
+   * the current issue is: in the action params we don't have the parmas from the bugged customfields*/
+  @Override
+  public void populateFromParams(final User user, final FieldValuesHolder fieldValuesHolder, final ActionParams actionParams)
+  {
+    String[] values = actionParams.getValuesForKey(customField.getId());
+    if (values!=null && values.length==1 && values[0]!=null) {
+        actionParams.put(customField.getId(), values[0].split(":"));
+    }
+      getCustomField().populateFromParams(fieldValuesHolder, actionParams.getKeysAndValues());
   }
 
   /**

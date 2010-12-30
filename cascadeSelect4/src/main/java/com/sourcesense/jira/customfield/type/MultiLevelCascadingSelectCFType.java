@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.atlassian.jira.ManagerFactory;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.customfields.config.item.DefaultValueConfigItem;
 import com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType;
 import com.atlassian.jira.issue.customfields.manager.GenericConfigManager;
@@ -214,11 +215,20 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
     
     /**
      * return the velocity parameter for the issue and custom field in input
+     * no woking for bugged
      * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#getVelocityParameters(com.atlassian.jira.issue.Issue, com.atlassian.jira.issue.fields.CustomField, com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem)
      */
     @Override
     public Map getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-        Map map = super.getVelocityParameters(issue, field, fieldLayoutItem);
+      MutableIssue mutableIssue=(MutableIssue)issue;
+      org.ofbiz.core.entity.GenericValue issueType=null ;
+      List associatedIssueTypes = field.getAssociatedIssueTypes();
+      if(associatedIssueTypes!=null)
+         issueType = (org.ofbiz.core.entity.GenericValue)associatedIssueTypes.get(0);
+      if(issueType!=null){
+        mutableIssue.setIssueTypeId(issueType.getString("id"));
+       }
+      Map map = super.getVelocityParameters(mutableIssue, field, fieldLayoutItem);
         FieldConfig fieldConfig;
         if (issue == null) {
             fieldConfig = field.getReleventConfig(new SearchContextImpl());
