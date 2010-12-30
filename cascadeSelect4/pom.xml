@@ -10,66 +10,23 @@
     <name>Multilevel Cascade Select</name>
     <description>Multilevel Cascade Select custom field, searcher and portlet</description>
     <packaging>jar</packaging>
-    <organization>
-        <name>Sourcesense srl</name>
-        <url>http://www.sourcesense.com/</url>
-    </organization>
 
     <scm>
-        <connection>scm:svn:https://dev.sourcesense.com/repos/dev/jira/cascadingSelect4/cascadeSelect4/trunk/</connection>
-        <developerConnection>scm:svn:https://dev.sourcesense.com/repos/dev/jira/cascadingSelect4/cascadeSelect4/trunk/k</developerConnection>
-        <url>https://dev.sourcesense.com/repos/dev/jira/cascadingSelect4/cascadeSelect4/trunk/</url>
+        <url>http://github.com/sourcesense/jira-multi-level-cascade-select</url>
+        <connection>scm:git:ssh://github.com/sourcesense/jira-multi-level-cascade-select.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/sourcesense/jira-multi-level-cascade-select.git</developerConnection>
     </scm>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jira.version>4.1.2</jira.version>
         <javac.src.version>1.6</javac.src.version>
         <javac.target.version>1.6</javac.target.version>
-        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZ</maven.build.timestamp.format>
-        <build.version>r${buildNumber}; ${maven.build.timestamp}</build.version>
     </properties>
 
-    <developers>
-        <developer>
-            <id>r.manicardi</id>
-            <name>Roberto Manicardi</name>
-            <email>r dot manicardi at sourcesense dot com</email>
-            <organization>Sourcesense S.r.l.</organization>
-            <organizationUrl>http://www.sourcesense.com/</organizationUrl>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>a.benedetti</id>
-            <name>Alessandro Benedetti</name>
-            <email>alessandro dot benedetti at sourcesense dot com</email>
-            <organization>Sourcesense S.r.l.</organization>
-            <organizationUrl>http://www.sourcesense.com/</organizationUrl>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
+
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.0-beta-4</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <doCheck>false</doCheck>
-                    <doUpdate>false</doUpdate>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>2.4.1</version>
@@ -91,22 +48,8 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                        <manifestEntries>
-                            <Implementation-Build>r${buildNumber}</Implementation-Build>
-                            <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
-                            <X-Compile-Source-JDK>${javac.src.version}</X-Compile-Source-JDK>
-                            <X-Compile-Target-JDK>${javac.target.version}</X-Compile-Target-JDK>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
             </plugin>
 
 
@@ -117,7 +60,6 @@
                 <configuration>
                     <source>${javac.src.version}</source>
                     <target>${javac.target.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
 
@@ -165,7 +107,7 @@
     </build>
 
     <profiles>
-        
+
         <profile>
             <id>webtest</id>
 
