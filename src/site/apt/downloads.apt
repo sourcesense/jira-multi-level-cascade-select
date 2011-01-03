@@ -1,0 +1,28 @@
+                                    ------
+                                    Home
+                                    ------
+                                    Sourcesense - Jira multi level Cascade Select
+                                    ------
+                                     2010
+
+~~
+~~   Copyright 2010 Sourcesense
+~~
+
+DOWNLOADS
+
+  <Multi Level Cascade Select Plug in> is a Plug In for the <Atlassian Jira> issue Tracker, that models a new custom field.
+  The new custom field allows you to have a cascading select with a multi level selection.
+
+*----------*--------------*----------------:
+| VERSION | DATE | DOWNLOAD |
+*----------*--------------*----------------:
+| 2.0 | 03/01/2011     |   {{{./build/cascadingselect-2.0-bundle.zip}2.0}}.       |
+*----------*--------------*----------------:
+ 
+
+Installation
+
+  After the download of the `cascadingselect-v.x-bundle.zip` package,
+  please copy all the files under `WEB-INF` directory to `${ATLASSIAN_HOME}/WEB_INF/`.
+  Simply extract the plug-in in the Jira Directory and the new Multi Level Cascading Select Custom Field will be added.

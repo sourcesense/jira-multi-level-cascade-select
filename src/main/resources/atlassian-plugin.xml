@@ -1,0 +1,162 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" >
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+    </plugin-info>
+    
+<jql-function key="multilevelcascadeOption" name="multilevelcascadeOption" class="com.sourcesense.jira.customfield.searcher.MultiLevelCascadeOptionFunction">
+  <!--The name of the function-->
+  <fname>multilevelcascadeOption</fname>
+  <!--Whether this function returns a list or a single value-->
+  <list>true</list>
+</jql-function>
+
+
+    <customfield-type key="multi-level-cascading-select" name="Multi level Cascading Select"
+                      class="com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType">
+        <description>Select list with more than two levels.</description>
+
+        <resource type="velocity" name="view"
+                  location="templates/plugins/customfield/multi-level-cascading-select-view.vm"/>
+        <resource type="velocity" name="edit"
+                  location="templates/plugins/customfield/multi-level-cascading-select-edit.vm"/>
+        <resource type="velocity" name="xml"
+                  location="templates/plugins/customfield/multi-level-cascading-select-xml.vm"/>
+    </customfield-type>
+
+<customfield-searcher key="multi-level-cascading-select-searcher" name="Multi level Cascading Select Searcher"
+                          class="com.sourcesense.jira.customfield.searcher.MultiLevelCascadingSelectSearcher4">
+        <resource type="velocity" name="view"
+                  location="templates/plugins/customfield/searcher/multi-level-cascading-select-view.vm"/>
+        <resource type="velocity" name="search"
+                  location="templates/plugins/customfield/searcher/multi-level-cascading-select-search.vm"/>
+        <resource type="velocity" name="label"
+                  location="templates/plugins/customfield/searcher/multi-level-cascading-select-label.vm"/>
+        <valid-customfield-type package="com.atlassian.jira.plugin.system.customfieldtypes" key="cascadingselect"/>
+        <valid-customfield-type package="${project.groupId}.${project.artifactId}" key="multi-level-cascading-select"/>
+    </customfield-searcher>
+
+    <webwork1 key="action-multi-level-cascading-select" name="Multi level cascading select configuration">
+        <description>Multi level cascading select configuration.</description>
+        <actions>
+            <action name="com.sourcesense.jira.customfield.config.EditCustomFieldMultiLevelOptions" alias="EditCustomFieldMultiLevelOptions"
+                    roles-required="admin">
+                <view name="input">/secure/admin/views/customfields/editcustomfieldmultileveloptions.jsp</view>
+                <view name="error">/secure/admin/views/customfields/editcustomfieldmultileveloptions.jsp</view>
+                <view name="confirmdelete">/secure/admin/views/customfields/deletecustomfieldoption.jsp</view>
+
+                <command name="configureOption" alias="ConfigureCustomFieldOptions">
+                    <view name="error">/secure/admin/views/customfields/editcustomfieldmultileveloptions.jsp</view>
+                </command>
+            </action>
+        </actions>
+    </webwork1>
+
+    <portlet key="filterstatsdoublecascading" name="Two Way Cascading Filter Statistics (cascading select)"
+             class="com.sourcesense.jira.portlets.TwoDimensionalCascadingStatsPortlet">
+        <description>Display statistics of a specified filter in a table including all cascading select levels.</description>
+        <resource type="velocity" name="view" location="templates/plugins/portlets/twodimensionalfilterstatsMulti.vm"/>
+        <!--  <resource type="i18n" name="i18n" location="com.sourcesense.jira.portlets.twodimensionalfilterstats"/>-->
+        <!--com.atlassian.jira.plugins.portlets.twodimensionalfilterstats-->
+        <label key="portlet.twodimenfilterstats.name"/>
+        <thumbnail>portlets/dashboard/thumbnails/2dfilterstats.png</thumbnail>
+        <properties>
+            <property>
+                <key>filterid</key>
+                <name>portlet.filterstats.field.filterid.name</name>
+                <description>portlet.filterstats.field.filterid.description</description>
+                <type>select</type>
+                <i18n>false</i18n>
+                <values class="com.atlassian.jira.portal.SearchRequestValuesGenerator"/>
+            </property>
+            <property>
+                <key>xAxis</key>
+                <name>portlet.twodimenfilterstats.field.xaxis.name</name>
+                <description>portlet.twodimenfilterstats.field.xaxis.description</description>
+                <type>select</type>
+                <values class="com.atlassian.jira.issue.statistics.FilterStatisticsValuesGenerator"/>
+            </property>
+            <property>
+                <key>yAxis</key>
+                <name>portlet.twodimenfilterstats.field.yaxis.name</name>
+                <description>portlet.twodimenfilterstats.field.yaxis.description</description>
+                <type>select</type>
+                <values class="com.atlassian.jira.issue.statistics.FilterStatisticsValuesGenerator"/>
+            </property>
+            <property>
+                <key>yAxisOrder</key>
+                <name>portlet.twodimenfilterstats.field.yaxis.order</name>
+                <description>portlet.twodimenfilterstats.field.yaxis.order.desc</description>
+                <type>select</type>
+                <values>
+                    <value>
+                        <key>natural</key>
+                        <value>portlet.twodimenfilterstats.field.yaxis.order.natural</value>
+                    </value>
+                    <value>
+                        <key>total</key>
+                        <value>common.words.total</value>
+                    </value>
+                </values>
+            </property>
+            <property>
+                <key>yAxisDirection</key>
+                <name>portlet.twodimenfilterstats.field.yaxis.direction</name>
+                <description>portlet.twodimenfilterstats.field.yaxis.direction.description</description>
+                <type>select</type>
+                <values>
+                    <value>
+                        <key>asc</key>
+                        <value>portlet.twodimenfilterstats.field.yaxis.direction.asc</value>
+                    </value>
+                    <value>
+                        <key>desc</key>
+                        <value>portlet.twodimenfilterstats.field.yaxis.direction.desc</value>
+                    </value>
+                </values>
+            </property>
+            <property>
+                <key>showTotals</key>
+                <name>portlet.twodimenfilterstats.field.showtotals.name</name>
+                <description>portlet.twodimenfilterstats.field.showtotals.description</description>
+                <type>select</type>
+                <default>false</default>
+                <values>
+                    <value>
+                        <key>true</key>
+                        <value>common.words.yes</value>
+                    </value>
+                    <value>
+                        <key>false</key>
+                        <value>common.words.no</value>
+                    </value>
+                </values>
+            </property>
+            <property>
+                <key>numberToShow</key>
+                <name>portlet.twodimenfilterstats.field.number.to.show</name>
+                <description>portlet.twodimenfilterstats.field.number.to.show.desc</description>
+                <type>long</type>
+            </property>
+            <property>
+                <key>xCascadingLevel</key>
+                <name>portlet.twodimenfilterstats.field.xcascadinglevel.name</name>
+                <description>portlet.twodimenfilterstats.field.xcascadinglevel.description</description>
+                <value>1</value>
+                <type>long</type>
+                <default>10</default>
+            </property>
+            <property>
+                <key>yCascadingLevel</key>
+                <name>portlet.twodimenfilterstats.field.ycascadinglevel.name</name>
+                <description>portlet.twodimenfilterstats.field.ycascadinglevel.description</description>
+                <value>1</value>
+                <type>long</type>
+                <default>10</default>
+            </property>
+        </properties>
+    </portlet>
+
+
+</atlassian-plugin>

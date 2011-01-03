@@ -1,0 +1,844 @@
+<?xml version="1.0"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <!-- General -->
+    <display-name>Atlassian JIRA Web Application</display-name>
+    <description>The Atlassian JIRA web application - see http://www.atlassian.com/software/jira for more information
+    </description>
+
+    <!-- Filters -->
+
+    <!-- First filter in the List. If serious problems were encountered on Startup, this filter will display an
+            appropriate error message for any requests. Basically it locks JIRA. -->
+    <filter>
+        <filter-name>JiraStartupChecklist</filter-name>
+        <filter-class>com.atlassian.jira.startup.JiraStartupChecklistFilter</filter-class>
+    </filter>
+
+
+    <filter>
+        <filter-name>headersanitising</filter-name>
+        <filter-class>com.atlassian.core.filters.HeaderSanitisingFilter</filter-class>
+    </filter>
+
+    <!--This filter is used to determine is there are any Application Errors before any pages are accessed    -->
+    <filter>
+        <filter-name>consistency</filter-name>
+        <filter-class>com.atlassian.johnson.filters.JohnsonFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>consistency503</filter-name>
+        <filter-class>com.atlassian.johnson.filters.Johnson503Filter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>consistencySoap</filter-name>
+        <filter-class>com.atlassian.johnson.filters.JohnsonSoapFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>consistencyXmlRpc</filter-name>
+        <filter-class>com.atlassian.johnson.filters.JohnsonXmlRpcFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>profiling</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.JIRAProfilingFilter</filter-class>
+        <init-param>
+            <!-- specify the which HTTP parameter to use to turn the filter on or off -->
+            <!-- if not specified - defaults to "profile.filter" -->
+            <param-name>activate.param</param-name>
+            <param-value>jira_profile</param-value>
+        </init-param>
+        <init-param>
+            <!-- specify the whether to start the filter automatically -->
+            <!-- if not specified - defaults to "true" -->
+            <param-name>autostart</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>request-cleanup</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.RequestCleanupFilter</filter-class>
+    </filter>
+
+    <!-- this filter sets an attribute in the request to stop JiraServletDispatcher from popping all actions off the stack.
+    It will clear the action stack AFTER the sitemesh decorator has rendered the page.-->
+    <filter>
+        <filter-name>action-cleanup-delay</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.ActionCleanupDelayFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-before-decoration</filter-name>
+        <filter-class>com.atlassian.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>before-decoration</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>sitemesh-exclude</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.SitemeshExcludePathFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>sitemesh</filter-name>
+        <filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>encoding</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.JiraEncodingFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-after-encoding</filter-name>
+        <filter-class>com.atlassian.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>after-encoding</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>caching</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.JiraCachingFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>curlyquotes</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.CurlyQuotesFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-before-login</filter-name>
+        <filter-class>com.atlassian.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>before-login</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>login</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.JiraLoginFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>trustedapps</filter-name>
+        <filter-class>com.atlassian.jira.security.auth.trustedapps.TrustedApplicationFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>security</filter-name>
+        <filter-class>com.atlassian.jira.security.JiraSecurityFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>gzip</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.gzip.JiraGzipFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>xsrf-token-addition</filter-name>
+        <filter-class>com.atlassian.jira.security.xsrf.XsrfTokenAdditionRequestFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>access</filter-name>
+        <filter-class>com.atlassian.jira.web.filters.accesslog.AccessLogFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-before-dispatch</filter-name>
+        <filter-class>com.atlassian.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>before-dispatch</param-value>
+        </init-param>
+    </filter>
+
+    <!-- First filter in the List. If serious problems were encountered on Startup, this filter will display an
+            appropriate error message for any requests. Basically it locks JIRA. -->
+    <filter-mapping>
+        <filter-name>JiraStartupChecklist</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- THIS MUST REMAIN AS THE TOP FILTER SO THAT THE ENCODING CAN BE SET BEFORE ANYTHING ELSE TOUCHES IT -->
+    <filter-mapping>
+        <filter-name>encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>caching</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+<!--
+    NOTE: This filter was intended to handle once-common windows-specific characters (like curly quotes)
+          but it has been found to interfere with gadget authentication between JIRA and Confluence.
+          You can re-enable it by uncommenting it here. See JRA-19856
+    -->
+    <!--
+    <filter-mapping>
+        <filter-name>curlyquotes</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    -->
+
+    <filter-mapping>
+        <filter-name>filter-plugin-dispatcher-after-encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- gzip *must* be before UrlRewriteFilter as the rewrite filter sends 'forwards' -->
+    <filter-mapping>
+        <filter-name>gzip</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- These mapping are for URL's that can handle an HTML error message when JIRA is unavailable -->
+    <filter-mapping>
+        <filter-name>consistency</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency</filter-name>
+        <url-pattern>*.jspa</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency</filter-name>
+        <url-pattern>/browse/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency</filter-name>
+        <url-pattern>/logout</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency</filter-name>
+        <url-pattern>*.vm</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency</filter-name>
+        <url-pattern>/lazyLoader</url-pattern>
+    </filter-mapping>
+
+    <!--
+        These mapping are for URL's that can NOT handle an HTML error message when JIRA is unavailable, these will
+        get a 503 Service Unavailable response instead.
+    -->
+    <filter-mapping>
+        <filter-name>consistency503</filter-name>
+        <url-pattern>/sr/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency503</filter-name>
+        <url-pattern>/si/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency503</filter-name>
+        <url-pattern>/download/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency503</filter-name>
+        <url-pattern>/plugins/servlet/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency503</filter-name>
+        <url-pattern>/secure/attachment/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency503</filter-name>
+        <url-pattern>/rpc/trackback/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>consistency503</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
+
+    <!--
+        This mapping is for the Soap endpoint URL's that can NOT handle an HTML error message when JIRA is unavailable,
+        these will get a proper SoapFault packet instead.
+    -->
+    <filter-mapping>
+        <filter-name>consistencySoap</filter-name>
+        <url-pattern>/rpc/soap/*</url-pattern>
+    </filter-mapping>
+
+    <!--
+        This mapping is for the XML-RPC endpoint URL's that can NOT handle an HTML error message when JIRA is unavailable,
+        these will get a proper XML-RPC Fault packet instead.
+    -->
+    <filter-mapping>
+        <filter-name>consistencyXmlRpc</filter-name>
+        <url-pattern>/rpc/xmlrpc</url-pattern>
+    </filter-mapping>
+
+
+    <filter-mapping>
+        <filter-name>request-cleanup</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>action-cleanup-delay</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>*.jspa</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>/browse/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>/rpc/*</url-pattern>
+    </filter-mapping>
+
+    <!-- profiling filter should be mapped to search request &amp; single issue -->
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>/si/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>/sr/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>/plugins/servlet/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>profiling</filter-name>
+        <url-pattern>/lazyLoader</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>filter-plugin-dispatcher-before-login</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>login</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>trustedapps</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>security</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>filter-plugin-dispatcher-before-decoration</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/logout.jsp</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/login.jsp</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh-exclude</filter-name>
+        <url-pattern>/secure/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/view/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/browse/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/plugins/servlet/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>xsrf-token-addition</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>access</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>filter-plugin-dispatcher-before-dispatch</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>headersanitising</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- listeners -->
+    <!--
+     This order is important for shutdown and startup, ie the ConsistencyLauncher will call "SHUTDOWN"
+     on a HSQL DB database, and so must be called 'after' the com.atlassian.jira.scheduler.JiraSchedulerLauncher
+    -->
+
+    <listener>
+        <listener-class>com.atlassian.jira.web.ServletContextProviderListener</listener-class>
+    </listener>
+
+    <!--
+     This listener runs startup checks and locks JIRA if problems are encountered.
+    -->
+    <listener>
+        <listener-class>com.atlassian.jira.startup.JiraStartupChecklistContextListener</listener-class>
+    </listener>
+
+    <!-- Check consistency of database etc -->
+    <listener>
+        <listener-class>com.atlassian.jira.upgrade.ConsistencyLauncher</listener-class>
+    </listener>
+
+    <!-- Check for upgrades, and automatically perform them if neccessary. -->
+    <listener>
+        <listener-class>com.atlassian.jira.upgrade.UpgradeLauncher</listener-class>
+    </listener>
+
+    <!-- Launch the scheduler, which loads all the jobs from scheduler-config.xml -->
+    <listener>
+        <listener-class>com.atlassian.jira.scheduler.JiraSchedulerLauncher</listener-class>
+    </listener>
+
+    <!-- XML-RPC / SOAP Listener -->
+    <listener>
+        <listener-class>com.atlassian.jira.soap.axis.JiraAxisHttpListener</listener-class>
+    </listener>
+
+    <!-- The JIRA user session tracker support -->
+    <listener>
+        <listener-class>com.atlassian.jira.web.session.currentusers.JiraUserSessionDestroyListener</listener-class>
+    </listener>
+
+    <!-- servlets -->
+    <servlet>
+        <servlet-name>action</servlet-name>
+        <servlet-class>com.atlassian.jira.web.dispatcher.JiraServletDispatcher</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>viewattachment</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.ViewAttachmentServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>viewthumbnail</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.ViewThumbnailServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>viewprojectavatar</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.ViewProjectAvatarServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>viewtemporaryavatar</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.ViewTemporaryAvatarServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>quicklink</servlet-name>
+        <servlet-class>com.atlassian.jira.servlet.QuickLinkServlet</servlet-class>
+    </servlet>
+
+    <!-- Used for tricking WebSphere 6.1.0.5 to push requests through the filter chain. This servlet
+    should never receive the actual requests as the requests should be intercepted, by e.g. URLRewrite filter.
+    Fixes JRA-12039 -->
+    <servlet>
+        <servlet-name>noopservlet</servlet-name>
+        <servlet-class>com.atlassian.jira.servlet.NoOpServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>trackback</servlet-name>
+        <servlet-class>com.atlassian.trackback.TrackbackListenerServlet</servlet-class>
+        <init-param>
+            <param-name>trackbackStore</param-name>
+            <param-value>com.atlassian.jira.trackback.OfbizTrackbackStore</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
+        <servlet-name>xmlrpc</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.rpc.XmlRpcServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>pluginvelocityservlet</servlet-name>
+        <servlet-class>com.atlassian.jira.plugin.webwork.JiraPluginWebworkVelocityServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>servlet-module-container-servlet</servlet-name>
+        <servlet-class>com.atlassian.jira.plugin.servlet.ServletModuleContainerServlet</servlet-class>
+    </servlet>
+
+    <!--
+    <servlet>
+    <servlet-name>ChartServlet</servlet-name>
+    <servlet-class>com.atlassian.jira.chart.ChartServlet</servlet-class>
+    </servlet>
+    -->
+
+    <servlet>
+        <servlet-name>logout</servlet-name>
+        <servlet-class>com.atlassian.jira.security.login.JiraLogoutServlet</servlet-class>
+    </servlet>
+
+    <!-- Axis SOAP Servlet -->
+    <servlet>
+        <servlet-name>axis-soap</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.rpc.LazyAxisDecoratorServlet</servlet-class>
+        <init-param>
+            <param-name>httpRegistryRoot</param-name>
+            <param-value>/</param-value>
+        </init-param>
+    </servlet>
+
+    <!-- IE6 expects CSS files to end with .css (JRA-3747) -->
+    <servlet>
+        <servlet-name>global.css</servlet-name>
+        <jsp-file>/styles/global_css.jsp</jsp-file>
+        <init-param>
+            <param-name>fork</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
+        <servlet-name>calendar.css</servlet-name>
+        <jsp-file>/includes/js/calendar/skins/aqua/theme.jsp</jsp-file>
+        <init-param>
+            <param-name>fork</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
+        <servlet-name>DisplayChart</servlet-name>
+        <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>file-server</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.FileServerServlet</servlet-class>
+        <load-on-startup>4</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>issue-view</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.IssueViewServlet</servlet-class>
+        <load-on-startup>4</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>searchrequest-view</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.SearchRequestViewServlet</servlet-class>
+        <load-on-startup>4</load-on-startup>
+    </servlet>
+
+    <!-- Servlet for displaying lazily loaded portlets -->
+    <servlet>
+        <servlet-name>lazy-portlet-loader</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.LazyLoadingPortletServlet</servlet-class>
+    </servlet>
+
+    <!-- Sitemesh velocity decorator -->
+    <servlet>
+        <servlet-name>velocity-decorator</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.VelocityDecoratorServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>attachmentzip</servlet-name>
+        <servlet-class>com.atlassian.jira.web.servlet.AttachmentZipServlet</servlet-class>
+    </servlet>
+    
+
+    <!-- JCAPTCHA -->
+    <servlet>
+        <servlet-name>captcha</servlet-name>
+        <servlet-class>com.atlassian.jira.servlet.JiraCaptchaServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>captcha</servlet-name>
+        <url-pattern>/captcha</url-pattern>
+    </servlet-mapping>
+
+    <!-- end:JCAPTCHA -->
+
+    <servlet-mapping>
+        <servlet-name>attachmentzip</servlet-name>
+        <url-pattern>/secure/attachmentzip/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>file-server</servlet-name>
+        <url-pattern>/download/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>calendar.css</servlet-name>
+        <url-pattern>/styles/calendar.css</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>global.css</servlet-name>
+        <url-pattern>/styles/global.css</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>servlet-module-container-servlet</servlet-name>
+        <url-pattern>/plugins/servlet/*</url-pattern>
+    </servlet-mapping>
+
+    <!--
+    <servlet-mapping>
+    <servlet-name>ChartServlet</servlet-name>
+    <url-pattern>/servlet/chart/*</url-pattern>
+    </servlet-mapping>
+    -->
+
+    <servlet-mapping>
+        <servlet-name>axis-soap</servlet-name>
+        <url-pattern>/rpc/soap/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>action</servlet-name>
+        <url-pattern>*.jspa</url-pattern>
+    </servlet-mapping>
+
+    <!-- These are dummy servlet mappings to trick WebSphere 6.1.0.5 to push the request through the filter chain, such
+    that the URLRewrite filter can rewrite the URLs. Fixes JRA-12039 -->
+    <servlet-mapping>
+        <servlet-name>noopservlet</servlet-name>
+        <url-pattern>/s/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>noopservlet</servlet-name>
+        <url-pattern>/databaseLockedError</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>noopservlet</servlet-name>
+        <url-pattern>/JiraLockedError</url-pattern>
+    </servlet-mapping>
+
+    <!-- This are dummy servlet mappings to trick WebSphere 6.1.0.5 to push the request through the filter chain, such
+    that the TrustedApplicationFilter filter can respond to the request. -->
+    <servlet-mapping>
+        <servlet-name>noopservlet</servlet-name>
+        <url-pattern>/admin/appTrustCertificate</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>viewattachment</servlet-name>
+        <url-pattern>/secure/attachment/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>viewthumbnail</servlet-name>
+        <url-pattern>/secure/thumbnail/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>viewprojectavatar</servlet-name>
+        <url-pattern>/secure/projectavatar</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>viewtemporaryavatar</servlet-name>
+        <url-pattern>/secure/temporaryavatar</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>quicklink</servlet-name>
+        <url-pattern>/browse/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>trackback</servlet-name>
+        <url-pattern>/rpc/trackback/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>xmlrpc</servlet-name>
+        <url-pattern>/rpc/xmlrpc</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>logout</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>pluginvelocityservlet</servlet-name>
+        <url-pattern>*.vm</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>DisplayChart</servlet-name>
+        <url-pattern>/charts</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>issue-view</servlet-name>
+        <url-pattern>/si/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>searchrequest-view</servlet-name>
+        <url-pattern>/sr/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>lazy-portlet-loader</servlet-name>
+        <url-pattern>/lazyLoader</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>velocity-decorator</servlet-name>
+        <url-pattern>*.vmd</url-pattern>
+    </servlet-mapping>
+
+    <!-- session config -->
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
+
+    <!-- mime mapping -->
+    <!-- currently the W3C havent settled on a media type for WSDL;
+    http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft
+    for now we go with the basic 'it's XML' response -->
+    <mime-mapping>
+        <extension>wsdl</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>xsd</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
+
+    <!-- welcome files -->
+    <welcome-file-list>
+        <welcome-file>default.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- error pages -->
+    <!-- commented out error pages for development
+    <error-page>
+    <error-code>404</error-code>
+    <location>/404page.jsp</location>
+    </error-page>-->
+    <error-page>
+        <error-code>500</error-code>
+        <location>/500page.jsp</location>
+    </error-page>
+
+    <!-- tag libraries -->
+    <taglib>
+        <taglib-uri>webwork</taglib-uri>
+        <taglib-location>/WEB-INF/tld/webwork.tld</taglib-location>
+    </taglib>
+    <taglib>
+        <taglib-uri>sitemesh-page</taglib-uri>
+        <taglib-location>/WEB-INF/tld/sitemesh-page.tld</taglib-location>
+    </taglib>
+    <taglib>
+        <taglib-uri>sitemesh-decorator</taglib-uri>
+        <taglib-location>/WEB-INF/tld/sitemesh-decorator.tld</taglib-location>
+    </taglib>
+    <taglib>
+        <taglib-uri>jiratags</taglib-uri>
+        <taglib-location>/WEB-INF/tld/atlassian-jira-tags.tld</taglib-location>
+    </taglib>
+
+    <!-- resource environment references -->
+
+    <!-- resource references -->
+    <!-- Uncomment for WebSphere
+    <resource-ref>
+        <description>Database for JIRA</description>
+        <res-ref-name>jdbc/JiraDS</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>SERVLET</res-auth>
+        <res-sharing-scope>Unshareable</res-sharing-scope>
+    </resource-ref>
+    Uncomment for WebSphere -->
+
+
+    <!-- security contraints -->
+
+    <!-- login config -->
+
+    <!-- security roles -->
+
+    <!-- environment entries -->
+
+    <!-- ejb references -->
+
+    <!-- ejb local references -->
+</web-app>
