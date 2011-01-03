@@ -1,7 +1,0 @@
-#if ($value)
-#if ($urlPrefix && $urlPrefix != '')
-    <a href="${urlPrefix}">$value</a>
-#else
-    $value
-#end
-#end
