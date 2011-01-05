@@ -1,0 +1,137 @@
+/*
+ *  Copyright 2010 Sourcesense
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+body {
+    padding: 0px 0px 10px 0px;
+}
+
+body,td,select,input,li {
+    font-size: 11px;
+}
+
+code {
+    font-family: Courier, monospace;
+    font-size: 13px;
+}
+
+#legend li.externalLink {
+    background: url(../images/window-new.png) left top no-repeat;
+    padding-left: 18px;
+}
+
+a.externalLink,a.externalLink:link,a.externalLink:visited,a.externalLink:active,a.externalLink:hover {
+    background: url(../images/window-new.png) right center no-repeat;
+    padding-right: 18px;
+}
+
+#legend li.newWindow {
+    background: url(../images/window-new.png) left top no-repeat;
+    padding-left: 18px;
+}
+
+a.newWindow,a.newWindow:link,a.newWindow:visited,a.newWindow:active,a.newWindow:hover {
+    background: url(../images/window-new.png) right center no-repeat;
+    padding-right: 18px;
+}
+
+p {
+    line-height: 1.3em;
+    font-size: small;
+}
+
+#leftColumn {
+    margin: 10px 0 0 5px;
+    background-color: #EAEAEA;
+}
+
+#navcolumn h5 {
+    font-size: smaller;
+    border-bottom: 1px dotted #666666;
+    padding-top: 2px;
+    height: auto;
+    color: #666666;
+    font-weight: bolder;
+}
+
+#navcolumn a, #navcolumn a.externalLink, #navcolumn a:active, #navcolumn a:hover {
+    color: #666666;
+    text-decoration: none;
+}
+
+#navcolumn a:hover {
+    text-decoration: underline;
+}
+
+#navcolumn li {
+    height: auto;
+    clear: both;
+}
+
+table.bodyTable th {
+    color: white;
+    background-color: #bbb;
+    text-align: left;
+    font-weight: bold;
+}
+
+table.bodyTable th,table.bodyTable td {
+    font-size: 1em;
+}
+
+table.bodyTable tr.a {
+    background-color: #ddd;
+}
+
+table.bodyTable tr.b {
+    background-color: #eee;
+}
+
+.source {
+    border: 1px solid #999;
+}
+
+dl {
+    padding: 4px 4px 4px 6px;
+    border: 1px solid #aaa;
+    background-color: #ffc;
+}
+
+dt {
+    color: #900;
+}
+
+#organizationLogo img,#projectLogo img,#projectLogo span {
+    margin: 8px;
+}
+
+#banner {
+    border-bottom: 1px solid #fff;
+}
+
+.errormark,.warningmark,.donemark,.infomark {
+    background: url(../images/dialog-error.png) no-repeat;
+}
+
+.warningmark {
+    background-image: url(../images/dialog-warning.png);
+}
+
+.donemark {
+    background-image: url(../images/dialog-apply.png);
+}
+
+.infomark {
+    background-image: url(../images/dialog-information.png);
+}
