@@ -1,6 +1,8 @@
 function dynamicMultiLevelSelect(masterId, slaveId) {
     var masterSelector = "select#" + masterId;
     var slaveSelector = "select#" + slaveId;
+jQuery(document).ready(function($) {
+    // Code that uses jQuery's $ can follow here.
 
     var slaveOptions = $("option", slaveSelector);
     $(masterSelector).change(
@@ -28,18 +30,23 @@ function dynamicMultiLevelSelect(masterId, slaveId) {
             clickFirstVisible(slaveSelector);
         }
     );
+  });
 }
 
 function clickFirstVisible(select) {
+jQuery(document).ready(function($) {
+    // Code that uses jQuery's $ can follow here.
 	$("option:first", select).each(
 		function() {
 			$(select).attr("selectedIndex", this.index);
 			$(select).trigger("change");
 		}
 	);
+  });
 }
 
 function selectOption(select, value) {
+jQuery(document).ready(function($) {
     var option = $("option[value='"+value+"']", select);
     if (option.size()>0) {
         $(select).attr("selectedIndex", option.get(0).index);
@@ -47,4 +54,5 @@ function selectOption(select, value) {
     } else {
         clickFirstVisible(select);
     }
+  });
 }

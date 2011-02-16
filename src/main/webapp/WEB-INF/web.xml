@@ -84,6 +84,10 @@
             <param-name>location</param-name>
             <param-value>before-decoration</param-value>
         </init-param>
+        <init-param>
+            <param-name>dispatcher</param-name>
+            <param-value>REQUEST</param-value>
+        </init-param>
     </filter>
 
     <filter>
@@ -108,6 +112,10 @@
             <param-name>location</param-name>
             <param-value>after-encoding</param-value>
         </init-param>
+        <init-param>
+            <param-name>dispatcher</param-name>
+            <param-value>REQUEST</param-value>
+        </init-param>
     </filter>
 
     <filter>
@@ -126,6 +134,10 @@
         <init-param>
             <param-name>location</param-name>
             <param-value>before-login</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dispatcher</param-name>
+            <param-value>REQUEST</param-value>
         </init-param>
     </filter>
 
@@ -165,6 +177,10 @@
         <init-param>
             <param-name>location</param-name>
             <param-value>before-dispatch</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dispatcher</param-name>
+            <param-value>REQUEST</param-value>
         </init-param>
     </filter>
 
