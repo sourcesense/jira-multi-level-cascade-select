@@ -92,7 +92,8 @@ public class MultiLevelCascadingSelectSearcher4 extends /*AbstractInitialization
     final OperatorUsageValidator usageValidator = componentLocator.getComponentInstanceOfType(OperatorUsageValidator.class);
    // final MultiLevelCascadingSelectDescriptor descTry=new MultiLevelCascadingSelectDescriptor(getDescriptor());
     final ClauseNames names = field.getClauseNames();
-    final FieldIndexer indexer = new MultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
+    //final FieldIndexer indexer = new MultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
+    final FieldIndexer indexer = new ValueLeadMultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
     final CustomFieldValueProvider customFieldValueProvider = new DefaultCustomFieldValueProvider();
 
     this.searcherInformation = new CustomFieldSearcherInformation(field.getId(), field.getNameKey(), Collections.<FieldIndexer> singletonList(indexer), new AtomicReference<CustomField>(field));
@@ -100,7 +101,9 @@ public class MultiLevelCascadingSelectSearcher4 extends /*AbstractInitialization
     this.searchInputTransformer = new MultiLevelCascadingSelectCustomFieldSearchInputTransformer(names, field, searcherInformation.getId(), selectConverter, jqlOperandResolver, jqlSelectOptionsUtil,
             jqlCascadingSelectLiteralUtil, queryContextConverter, customFieldInputHelper);// ?
 
-    ClauseQueryFactory queryFactory = new MultiLevelCascadingSelectingQueryFactory(field, field.getId(), jqlSelectOptionsUtil, jqlOperandResolver, jqlCascadingSelectLiteralUtil);
+    //ClauseQueryFactory queryFactory = new MultiLevelCascadingSelectingQueryFactory(field, field.getId(), jqlSelectOptionsUtil, jqlOperandResolver, jqlCascadingSelectLiteralUtil);
+    ClauseQueryFactory queryFactory = new ValueBasedMultiLevelCascadingSelectingQueryFactory(field, field.getId(), jqlSelectOptionsUtil, jqlOperandResolver, jqlCascadingSelectLiteralUtil);
+    
     queryFactory = new ValidatingDecoratorQueryFactory(usageValidator, queryFactory);
 
     this.customFieldSearcherClauseHandler = new SimpleCustomFieldClauseContextHandler(componentFactory.createObject(MultiLevelCascadingSelectCustomFieldValidator.class, field), queryFactory, componentFactory

@@ -1,12 +1,10 @@
-
 #if (!$request || !$request.getAttribute("multilevelcascade"))
 $!request.setAttribute("multilevelcascade" , "true")
-## @TODO Somewhat of a hack should move when fields is refactored.
     <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/cascadingUtil.js"></script>
     <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/multilevelcascadingUtil.js"></script>
-    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/jquery-1.3.2.min.js"></script>
+##    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/jquery-1.3.2.min.js"></script>
 #end
-
+$!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
 #searcherEditHeader ($customField.id $customField.name)
 
 ## #set ($selectedParent = "")
@@ -65,7 +63,7 @@ $!request.setAttribute("multilevelcascade" , "true")
 #end
 
 #searcherEditFooter ($customField.id $customField.description)
-
+$!{auiparams.clear()}
 <script>
     dynamicMultiLevelSelect('${customField.id}', '${customField.id}\\:1');
     $!script

@@ -29,15 +29,29 @@ public class MultiLevelCascadingSelectValue {
     /**
      * 
      * return the list of options, splitting the string value
+     * c'è da capire perchè alcune option gli arrivano per valore e altre per idùindagare
      * @return
      */
     private List<String> getOptionList() {
         List<String> list = new ArrayList<String>();
-        List<String> values = Arrays.asList(value.split(":"));
-        for (String value:values) {
-            Long optionId = OptionUtils.safeParseLong(value);
-            Option option = optionsManager.findByOptionId(optionId);
-            list.add(option.toString());
+        
+        if (value!=null&&!value.equals("")) {
+          System.out.println("VALUE:"+value);
+          List<String> values = Arrays.asList(value.split(":"));
+          for (String value : values) {
+              Long optionId = OptionUtils.safeParseLong(value);
+              System.out.println("Searching via OptionManager :"+optionId);
+              if(optionId!=null){
+              Option option = optionsManager.findByOptionId(optionId);
+              list.add(option.toString());}
+              else{
+                List<Option> option = optionsManager.findByOptionValue(value);
+                System.out.println(option.size()+"OPT 0 :"+option.get(0).toString());
+                list.add(option.get(0).toString());
+              }
+          }
+        }else{
+          System.out.println("Value not present");
         }
         return list;
     }
