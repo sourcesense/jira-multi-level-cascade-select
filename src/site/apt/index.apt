@@ -23,6 +23,6 @@ Installation
   Simply extract the plug-in in the Jira Directory and the new Multi Level Cascading Select Custom Field will be added.
   
 Note
-  If you are upgrading from versions < 2.4, you need to rebuild the JIRA index (see {{{http://confluence.atlassian.com/display/JIRA/Search+Indexing}here}} )
+  If you are upgrading from versions \< 2.4, you need to rebuild the JIRA index (see {{{http://confluence.atlassian.com/display/JIRA/Search+Indexing}here}} )
 
   
