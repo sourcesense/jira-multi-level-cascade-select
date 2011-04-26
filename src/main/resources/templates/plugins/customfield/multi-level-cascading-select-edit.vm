@@ -39,6 +39,8 @@ $!request.setAttribute("multilevelcascade" , "true")
     #end
 #end
 
+#set ($customList = $mlcscftype.getOptionMapFromOptions($configs.options))
+
 #if ($customList.get(null))
     <select name="${customField.id}" id="${customField.id}">
         #if (!$fieldLayoutItem.required)

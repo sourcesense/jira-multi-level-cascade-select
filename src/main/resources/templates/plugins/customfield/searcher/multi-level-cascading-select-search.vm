@@ -2,20 +2,11 @@
 $!request.setAttribute("multilevelcascade" , "true")
     <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/cascadingUtil.js"></script>
     <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/multilevelcascadingUtil.js"></script>
-##    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/jquery-1.3.2.min.js"></script>
 #end
 $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
 #searcherEditHeader ($customField.id $customField.name)
 
-## #set ($selectedParent = "")
-## #if ($value.getValuesForKey(null) && !$value.getValuesForKey(null).empty)
-##     #set ($selectedParent = $value.getValuesForKey(null).iterator().next())
-## #end
-##
-## #set ($selectedChild = "")
-## #if ($value.getValuesForKey('1') && !$value.getValuesForKey('1').empty)
-##     #set ($selectedChild = $value.getValuesForKey('1').iterator().next())
-## #end
+
 
 #macro(renderSelect $key $customfieldid $levels)
     #if ($levels.get($key))
@@ -37,6 +28,8 @@ $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
         </select>
     #end
 #end
+
+#set ($customList = $mlcscftype.getOptionMapFromOptions($configs.options))
 
 #if ($customList.get(null))
     <select name="${customField.id}" id="${customField.id}">

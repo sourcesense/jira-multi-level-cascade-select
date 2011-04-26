@@ -26,7 +26,6 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.index.indexers.FieldIndexer;
 import com.atlassian.jira.issue.search.ClauseNames;
 import com.atlassian.jira.issue.search.SearchContext;
-import com.atlassian.jira.issue.search.searchers.impl.AbstractInitializationSearcher;
 import com.atlassian.jira.issue.search.searchers.information.SearcherInformation;
 import com.atlassian.jira.issue.search.searchers.renderer.SearchRenderer;
 import com.atlassian.jira.issue.search.searchers.transformer.SearchInputTransformer;
@@ -49,12 +48,12 @@ import com.sourcesense.jira.customfield.statistic.MultiLevelCascadingSelectStati
 
 /**
  * This class is the main class for Multi Level Cascading Select Custom Field Searcher. It has the
- * rensponsibility of coordinate all the classes used with the JQL search model.
+ * responsibility of coordinate all the classes used with the JQL search model.
  * 
  * @author Alessandro Benedetti
  * 
  */
-public class MultiLevelCascadingSelectSearcher4 extends /*AbstractInitializationMultiLevelSearcher*/AbstractInitializationCustomFieldSearcher implements CustomFieldSearcher,CustomFieldStattable {
+public class MultiLevelCascadingSelectSearcher4 extends AbstractInitializationCustomFieldSearcher implements CustomFieldSearcher,CustomFieldStattable {
 
   private volatile CustomFieldSearcherInformation searcherInformation;
 
@@ -90,10 +89,9 @@ public class MultiLevelCascadingSelectSearcher4 extends /*AbstractInitialization
     final QueryContextConverter queryContextConverter = componentLocator.getComponentInstanceOfType(QueryContextConverter.class);
     final CustomFieldInputHelper customFieldInputHelper = componentLocator.getComponentInstanceOfType(CustomFieldInputHelper.class);
     final OperatorUsageValidator usageValidator = componentLocator.getComponentInstanceOfType(OperatorUsageValidator.class);
-   // final MultiLevelCascadingSelectDescriptor descTry=new MultiLevelCascadingSelectDescriptor(getDescriptor());
     final ClauseNames names = field.getClauseNames();
-    //final FieldIndexer indexer = new MultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
-    final FieldIndexer indexer = new ValueLeadMultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
+    final FieldIndexer indexer = new MultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
+    //final FieldIndexer indexer = new ValueLeadMultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
     final CustomFieldValueProvider customFieldValueProvider = new DefaultCustomFieldValueProvider();
 
     this.searcherInformation = new CustomFieldSearcherInformation(field.getId(), field.getNameKey(), Collections.<FieldIndexer> singletonList(indexer), new AtomicReference<CustomField>(field));
@@ -101,8 +99,8 @@ public class MultiLevelCascadingSelectSearcher4 extends /*AbstractInitialization
     this.searchInputTransformer = new MultiLevelCascadingSelectCustomFieldSearchInputTransformer(names, field, searcherInformation.getId(), selectConverter, jqlOperandResolver, jqlSelectOptionsUtil,
             jqlCascadingSelectLiteralUtil, queryContextConverter, customFieldInputHelper);// ?
 
-    //ClauseQueryFactory queryFactory = new MultiLevelCascadingSelectingQueryFactory(field, field.getId(), jqlSelectOptionsUtil, jqlOperandResolver, jqlCascadingSelectLiteralUtil);
-    ClauseQueryFactory queryFactory = new ValueBasedMultiLevelCascadingSelectingQueryFactory(field, field.getId(), jqlSelectOptionsUtil, jqlOperandResolver, jqlCascadingSelectLiteralUtil);
+    ClauseQueryFactory queryFactory = new MultiLevelCascadingSelectingQueryFactory(field, field.getId(), jqlSelectOptionsUtil, jqlOperandResolver, jqlCascadingSelectLiteralUtil);
+    //ClauseQueryFactory queryFactory = new ValueBasedMultiLevelCascadingSelectingQueryFactory(field, field.getId(), jqlSelectOptionsUtil, jqlOperandResolver, jqlCascadingSelectLiteralUtil);
     
     queryFactory = new ValidatingDecoratorQueryFactory(usageValidator, queryFactory);
 

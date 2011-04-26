@@ -27,6 +27,7 @@ import com.atlassian.jira.issue.customfields.view.CustomFieldParams;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
+import com.atlassian.jira.issue.search.SearchContext;
 import com.atlassian.jira.issue.search.SearchContextImpl;
 import com.atlassian.jira.jql.util.JqlSelectOptionsUtil;
 import com.atlassian.jira.util.EasyList;
@@ -101,12 +102,6 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
       errorCollectionToAddTo.addError(customFieldId, getI18nBean().getText("admin.errors.option.invalid.for.context", "'" + parentOption + "'", "'" + config.getName() + "'"));
       return false;
     }
-    /*
-     * if (!equalsOption(option.getParentOption(), parentOption)) {
-     * errorCollectionToAddTo.addError(customFieldId,
-     * getI18nBean().getText("admin.errors.option.invalid.for.context", "'" + parentOption + "'",
-     * "'" + config.getName() + "'")); return false; }
-     */
 
     return true;
   }
@@ -127,33 +122,6 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
     return null;
   }
 
-  /**
-   * validates the params of a custom field, transforming them in Options and checking the validity
-   * of each option.
-   * 
-   * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#validateFromParams(com.atlassian.jira.issue.customfields.view.CustomFieldParams,
-   *      com.atlassian.jira.util.ErrorCollection,
-   *      com.atlassian.jira.issue.fields.config.FieldConfig)
-   * 
-   @Override public void validateFromParams(CustomFieldParams relevantParams, ErrorCollection
-   *           errorCollectionToAddTo, FieldConfig config) {
-   *           log.debug("Pre- Validate Error collection: [" + errorCollectionToAddTo.getErrors() +
-   *           "]");
-   * 
-   *           if (relevantParams == null || relevantParams.isEmpty()) { return; }
-   * 
-   *           Option parentOption = null; String customFieldId = config.getCustomField().getId();
-   *           for (int i = 0; i < relevantParams.getAllKeys().size(); i++) { Collection<String>
-   *           valueStrings=relevantParams.getAllValues(); String[] splittedStrings=null; for(String
-   *           s:valueStrings){ splittedStrings = s.split(":"); } for(int
-   *           j=0;j<splittedStrings.length;j++) { Long longOptionValue=new
-   *           Long(splittedStrings[j]); Option option =
-   *           jqlSelectOptionsUtil.getOptionById(longOptionValue); if (option!=null) {
-   *           log.debug("check option: [" + option + "]"); if (!checkOption(customFieldId, option,
-   *           parentOption, errorCollectionToAddTo, config)) { return; } } parentOption = option;}
-   *           } log.debug("Post-Validate Error collection: [" + errorCollectionToAddTo.getErrors()
-   *           + "]"); }
-   */
 
   public void validateFromParams(CustomFieldParams relevantParams, ErrorCollection errorCollectionToAddTo, FieldConfig config) {
     log.debug("Pre- Validate Error collection: [" + errorCollectionToAddTo.getErrors() + "]");
@@ -210,6 +178,16 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
     return configurationItemTypes;
   }
 
+  
+  public OptionsMap getOptionMapFromOptions(Options options){
+	  
+	  return new OptionsMap(options);
+  }
+  
+  
+  
+  
+  
   /**
    * return the velocity parameter for the issue and custom field in input no woking for bugged
    * 
@@ -219,53 +197,16 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
    */
   @Override
   public Map getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-    org.ofbiz.core.entity.GenericValue issueType = null;
-    List associatedIssueTypes = field.getAssociatedIssueTypes();
-    if (associatedIssueTypes != null)
-      issueType = (org.ofbiz.core.entity.GenericValue) associatedIssueTypes.get(0);
-    if(issue!=null){
-     Long id=issue.getId();
-     IssueManager issueManager = ComponentManager.getInstance().getIssueManager();
-     MutableIssue issueObject = issueManager.getIssueObject(new Long(id));
-     issueObject.setIssueType(issueType);
-     /*
-      if(!issue.getClass().getName().equals("com.atlassian.jira.issue.DocumentIssueImpl")){
-        MutableIssue mutableIssue = (MutableIssue) issue;
-        mutableIssue.setIssueType(issueType);
-      }else{
-        DocumentIssueImpl currentIssue=(DocumentIssueImpl)issue;
-        IssueManager iManager=
-      }*/
-    }
+   
     
-    
-    /*
-    if (issue != null && !issue.getClass().getName().equals("com.atlassian.jira.issue.DocumentIssueImpl")) {
-      MutableIssue mutableIssue = (MutableIssue) issue;
-      org.ofbiz.core.entity.GenericValue issueType = null;
-      List associatedIssueTypes = field.getAssociatedIssueTypes();
-      if (associatedIssueTypes != null)
-        issueType = (org.ofbiz.core.entity.GenericValue) associatedIssueTypes.get(0);
-      if (issueType != null && mutableIssue != null) {
-        mutableIssue.setIssueTypeId(issueType.getString("id"));
-      }
-    } else {
-      DocumentIssueImpl currentIssue=(DocumentIssueImpl)issue;
-      currentIssue.
-      System.out.println("com.atlassian.jira.issue.DocumentIssueImpl not support MutableIssue");
-    }*/
     Map map = super.getVelocityParameters(issue, field, fieldLayoutItem);
-    FieldConfig fieldConfig;
-    if (issue == null) {
-      fieldConfig = field.getReleventConfig(new SearchContextImpl());
-    } else {
-      fieldConfig = field.getRelevantConfig(issue);
-    }
-    Options options = optionsManager.getOptions(fieldConfig);
-    map.put("customList", new OptionsMap(options));
+   
+ 
+    map.put("mlcscftype", this);
     map.put("fieldLayout", fieldLayoutItem);
     return map;
   }
+ 
 
   private final Logger log = Logger.getLogger(MultiLevelCascadingSelectCFType.class);
 }
