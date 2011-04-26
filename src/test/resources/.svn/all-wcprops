@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/test/resources
+END
+entityengine.xml
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/test/resources/entityengine.xml
+END
+jira-application.properties
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/test/resources/jira-application.properties
+END
+TEST_RESOURCES_README
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/test/resources/TEST_RESOURCES_README
+END

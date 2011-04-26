@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/main/resources/templates/plugins/customfield/searcher
+END
+multi-level-cascading-select-view.vm
+K 25
+svn:wc:ra_dav:version-url
+V 163
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/main/resources/templates/plugins/customfield/searcher/multi-level-cascading-select-view.vm
+END
+multi-level-cascading-select-label.vm
+K 25
+svn:wc:ra_dav:version-url
+V 164
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/main/resources/templates/plugins/customfield/searcher/multi-level-cascading-select-label.vm
+END
+multi-level-cascading-select-search.vm
+K 25
+svn:wc:ra_dav:version-url
+V 165
+/repos/!svn/ver/42125/dev/jira/jira-multi-level-cascade-select/trunk/src/main/resources/templates/plugins/customfield/searcher/multi-level-cascading-select-search.vm
+END
