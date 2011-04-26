@@ -13,6 +13,29 @@ DOWNLOADS
 
   <Multi Level Cascade Select Plug in> is a Plug In for the <Atlassian Jira> issue Tracker, that models a new custom field.
   The new custom field allows you to have a cascading select with a multi level selection.
+  
+  
+* 2.5-SNAPSHOT
+  This version is compatible with JIRA > 4.3
+
+*----------*--------------*----------------:
+| | DATE | DOWNLOAD |
+*----------*--------------*----------------:
+| Multi Level Cascade Select 2.5 (tar.gz) | 26/04/2011     | {{{./bin/2.5-SNAPSHOT/cascadingselect-2.5-SNAPSHOT-bundle.tar.gz}cascadingselect-2.5-SNAPSHOT-bundle.tar.gz}} |
+*----------*--------------*----------------:
+| Multi Level Cascade Select 2.5 (zip) | 26/04/2011     | {{{./bin/2.5-SNAPSHOT/cascadingselect-2.5-SNAPSHOT-bundle.zip}cascadingselect-2.5-SNAPSHOT-bundle.zip}} |
+*----------*--------------*----------------: 
+
+* 2.4-SNAPSHOT
+  This version is compatible with JIRA < 4.3
+
+*----------*--------------*----------------:
+| | DATE | DOWNLOAD |
+*----------*--------------*----------------:
+| Multi Level Cascade Select 2.4 (tar.gz) | 26/04/2011     | {{{./bin/2.4-SNAPSHOT/cascadingselect-2.4-SNAPSHOT-bundle.tar.gz}cascadingselect-2.4-SNAPSHOT-bundle.tar.gz}} |
+*----------*--------------*----------------:
+| Multi Level Cascade Select 2.4 (zip) | 26/04/2011     | {{{./bin/2.4-SNAPSHOT/cascadingselect-2.4-SNAPSHOT-bundle.zip}cascadingselect-2.4-SNAPSHOT-bundle.zip}} |
+*----------*--------------*----------------: 
 
 * 2.3-SNAPSHOT
 
