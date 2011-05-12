@@ -14,6 +14,9 @@ DOWNLOADS
   <Multi Level Cascade Select Plug in> is a Plug In for the <Atlassian Jira> issue Tracker, that models a new custom field.
   The new custom field allows you to have a cascading select with a multi level selection.
   
+COMMERCIAL SUPPORT
+
+If you are looking for commercial support for this plugin {{{mailto://info@sourcesense.com?subject=Multicascade}contact us}}, we will be happy to oblige!
   
 * 2.5-SNAPSHOT
   This version is compatible with JIRA \> 4.3
