@@ -25,7 +25,7 @@ public class MultiLevelCascadingSelectValue {
     }
 
     public String getSearchValue() {
-        return value;
+        return value;// try to comment 2.4.x
     }
 
   
