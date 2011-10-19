@@ -1,8 +1,9 @@
-package com.sourcesense.jira.customfield.searcher;
+package com.sourcesense.jira.customfield.searcher.indexer;
 
 import static com.atlassian.jira.util.dbc.Assertions.notNull;
 
 import java.util.Collection;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
@@ -116,18 +117,24 @@ public class MultiLevelCascadingSelectIndexer extends AbstractCustomFieldIndexer
    */
   private String serializeOptions(final CustomFieldParams customFieldParams){
 	  String serializedOption= "";
+	  TreeMap<String,String> level2value=new TreeMap<String,String>(new LevelStringComparator());
 	  	
 	  for (String level : customFieldParams.getAllKeys()) {
 	      Option currentOption;
           currentOption = getOpt(customFieldParams.getValuesForKey(level));
+          //System.out.println("Level:"+level+"value:"+currentOption.getValue());
           if (currentOption != null) {
-        	 if(serializedOption.equals("")){
-        		 serializedOption +=currentOption.getValue();
-        	 }else{
-        		 serializedOption += " - "+currentOption.getValue();
-        	 }
+            level2value.put(level, currentOption.getValue());
           }
 	  }
+	  for(String levelOrdered:level2value.keySet()){
+	  
+	  if(serializedOption.equals("")){
+      serializedOption +=level2value.get(levelOrdered);
+    }else{
+      serializedOption += " - "+level2value.get(levelOrdered);
+    }}
+	  System.out.println("Serialized Options:"+serializedOption);
 	  return serializedOption;
   }
   
