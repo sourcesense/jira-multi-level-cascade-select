@@ -26,7 +26,7 @@ class SupportedOperatorsValidator
 
     SupportedOperatorsValidator(Collection<Operator>... supportedOperatorSets)
     {
-        Set<Operator> tmpOperators = EnumSet.noneOf(Operator.class);
+    Set<Operator> tmpOperators = EnumSet.noneOf(Operator.class);
         for (Collection<Operator> supportedOperatorSet : supportedOperatorSets)
         {
             tmpOperators.addAll(supportedOperatorSet);

@@ -13,6 +13,8 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
+import com.atlassian.jira.ManagerFactory;
+import com.atlassian.jira.issue.customfields.manager.OptionsManager;
 import com.atlassian.jira.issue.customfields.option.Option;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.jql.operand.JqlOperandResolver;
@@ -55,6 +57,8 @@ public class ValueBasedMultiLevelCascadingSelectingQueryFactory implements Claus
 
   private final CustomField customField;
 
+  private final OptionsManager optionsManager;
+
   public ValueBasedMultiLevelCascadingSelectingQueryFactory(final CustomField customField, final String luceneField, final JqlSelectOptionsUtil jqlSelectOptionsUtil,
           final JqlOperandResolver jqlOperandResolver, final JqlCascadingSelectLiteralUtil jqlCascadingSelectLiteralUtil) {
     this.customField = notNull("customField", customField);
@@ -63,6 +67,7 @@ public class ValueBasedMultiLevelCascadingSelectingQueryFactory implements Claus
     this.jqlCascadingSelectLiteralUtil = notNull("jqlCascadingSelectLiteralUtil", jqlCascadingSelectLiteralUtil);
     this.parentFieldName = notBlank("luceneField", luceneField);
     this.childFieldName = notBlank("luceneField", luceneField) + ":";
+    this.optionsManager=ManagerFactory.getOptionsManager();
   }
 
   /**

@@ -2,20 +2,14 @@ package com.sourcesense.jira.customfield.type;
 
 import static com.atlassian.jira.util.dbc.Assertions.notNull;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.ManagerFactory;
-import com.atlassian.jira.issue.DocumentIssueImpl;
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.customfields.config.item.DefaultValueConfigItem;
 import com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType;
 import com.atlassian.jira.issue.customfields.manager.GenericConfigManager;
@@ -27,8 +21,6 @@ import com.atlassian.jira.issue.customfields.view.CustomFieldParams;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
-import com.atlassian.jira.issue.search.SearchContext;
-import com.atlassian.jira.issue.search.SearchContextImpl;
 import com.atlassian.jira.jql.util.JqlSelectOptionsUtil;
 import com.atlassian.jira.util.EasyList;
 import com.atlassian.jira.util.ErrorCollection;
@@ -43,6 +35,12 @@ import com.sourcesense.jira.customfield.config.SettableMultiLevelOptionsConfigIt
  */
 
 public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
+  public static String EMPTY_VALUE = "_none_";
+
+  public static String EMPTY_VALUE_ID = "-2";
+
+  public static long EMPTY_VALUE_ID_LONG = -2;
+
   private final JqlSelectOptionsUtil jqlSelectOptionsUtil;
 
   public MultiLevelCascadingSelectCFType(OptionsManager optionsManager, CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager,
@@ -110,18 +108,20 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
    * trasforms the object(Option) in input in an Option.
    * 
    * @param value
+   * @param object
    * @return
    */
-  private Option trasformToOption(Object value) {
+  private Option trasformToOption(FieldConfig config, Object value) {
     if (value instanceof Option) {
       return (Option) value;
     }
-    if (value instanceof String && !"-1".equals(value)) {
+    if (value instanceof String && EMPTY_VALUE_ID.equals(value)) {
+      return super.optionsManager.createOption(config, EMPTY_VALUE_ID_LONG, EMPTY_VALUE_ID_LONG, EMPTY_VALUE);
+    } else if (value instanceof String && !"-1".equals(value)) {
       return (Option) this.getSingularObjectFromString((String) value);
     }
     return null;
   }
-
 
   public void validateFromParams(CustomFieldParams relevantParams, ErrorCollection errorCollectionToAddTo, FieldConfig config) {
     log.debug("Pre- Validate Error collection: [" + errorCollectionToAddTo.getErrors() + "]");
@@ -132,9 +132,10 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
 
     Option parentOption = null;
     String customFieldId = config.getCustomField().getId();
-    for (int i = 0; i < relevantParams.getAllKeys().size(); i++) {
-      Option option1 = trasformToOption(relevantParams.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
-      if (option1 != null && !option1.toString().contains(":")) {
+    int count = relevantParams.getAllKeys().size();
+    for (int i = 0; i < count; i++) {
+      Option option1 = trasformToOption(config, relevantParams.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
+      if (option1 != null && !option1.toString().contains(":") && !option1.toString().equals(EMPTY_VALUE)) {
         if (option1 != null) {
           log.debug("check option: [" + option1 + "]");
           if (!checkOption(customFieldId, option1, parentOption, errorCollectionToAddTo, config)) {
@@ -149,15 +150,18 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
           splittedStrings = s.split(":");
         }
         for (int j = 0; j < splittedStrings.length; j++) {
-          Long longOptionValue = new Long(splittedStrings[j]);
-          Option option = jqlSelectOptionsUtil.getOptionById(longOptionValue);
-          if (option != null) {
-            log.debug("check option: [" + option + "]");
-            if (!checkOption(customFieldId, option, parentOption, errorCollectionToAddTo, config)) {
-              return;
+          // this part probably is useless, but for sure is not useful for "none" options
+          if (!splittedStrings[j].equals(EMPTY_VALUE_ID)) {
+            Long longOptionValue = new Long(splittedStrings[j]);
+            Option option = jqlSelectOptionsUtil.getOptionById(longOptionValue);
+            if (option != null) {
+              log.debug("check option: [" + option + "]");
+              if (!checkOption(customFieldId, option, parentOption, errorCollectionToAddTo, config)) {
+                return;
+              }
             }
+            parentOption = option;
           }
-          parentOption = option;
         }
 
       }
@@ -178,16 +182,11 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
     return configurationItemTypes;
   }
 
-  
-  public OptionsMap getOptionMapFromOptions(Options options){
-	  
-	  return new OptionsMap(options);
+  public OptionsMap getOptionMapFromOptions(Options options) {
+
+    return new OptionsMap(options);
   }
-  
-  
-  
-  
-  
+
   /**
    * return the velocity parameter for the issue and custom field in input no woking for bugged
    * 
@@ -197,16 +196,13 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
    */
   @Override
   public Map getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-   
-    
+
     Map map = super.getVelocityParameters(issue, field, fieldLayoutItem);
-   
- 
+
     map.put("mlcscftype", this);
     map.put("fieldLayout", fieldLayoutItem);
     return map;
   }
- 
 
   private final Logger log = Logger.getLogger(MultiLevelCascadingSelectCFType.class);
 }

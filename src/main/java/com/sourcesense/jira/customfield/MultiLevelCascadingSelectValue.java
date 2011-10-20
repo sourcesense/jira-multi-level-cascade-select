@@ -11,29 +11,27 @@ import com.atlassian.jira.issue.customfields.option.Option;
 
 /**
  * @author Alessandro Benedetti
- *
+ * 
  */
 public class MultiLevelCascadingSelectValue {
-    private String value;
-    private OptionsManager optionsManager;
-    
-    private static final Logger log = Logger.getLogger(MultiLevelCascadingSelectValue.class);
+  private String value;
 
-    public MultiLevelCascadingSelectValue(OptionsManager optionsManager, String value) {
-        this.optionsManager = optionsManager;
-        this.value = value;
-    }
+  private OptionsManager optionsManager;
 
-    public String getSearchValue() {
-        return value;// try to comment 2.4.x
-    }
+  private static final Logger log = Logger.getLogger(MultiLevelCascadingSelectValue.class);
 
-  
+  public MultiLevelCascadingSelectValue(OptionsManager optionsManager, String value) {
+    this.optionsManager = optionsManager;
+    this.value = value;
+  }
 
-    @Override
-    public String toString() {
-        return value;
-    }
+  public String getSearchValue() {
+    return value;// try to comment 2.4.x
+  }
 
-   
+  @Override
+  public String toString() {
+    return value;
+  }
+
 }

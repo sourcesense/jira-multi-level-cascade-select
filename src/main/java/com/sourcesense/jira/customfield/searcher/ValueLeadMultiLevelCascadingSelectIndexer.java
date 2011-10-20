@@ -29,24 +29,21 @@ import com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType;
  */
 /**
  * @author developer
- *
+ * 
  */
 @NonInjectableComponent
 public class ValueLeadMultiLevelCascadingSelectIndexer extends AbstractCustomFieldIndexer {
   public static final String CHILD_INDEX_SUFFIX = ":" + CascadingSelectCFType.CHILD_KEY;
 
- 
-
-
-
   private final CustomField customField;
 
   // /CLOVER:OFF
 
-  public ValueLeadMultiLevelCascadingSelectIndexer(final FieldVisibilityManager fieldVisibilityManager, final CustomField customField, JqlSelectOptionsUtil jqlSelectOptionsUtil, SelectConverter selectConverter) {
+  public ValueLeadMultiLevelCascadingSelectIndexer(final FieldVisibilityManager fieldVisibilityManager, final CustomField customField, JqlSelectOptionsUtil jqlSelectOptionsUtil,
+          SelectConverter selectConverter) {
     super(fieldVisibilityManager, notNull("customField", customField));
     this.customField = customField;
-  
+
   }
 
   @Override
@@ -60,7 +57,9 @@ public class ValueLeadMultiLevelCascadingSelectIndexer extends AbstractCustomFie
   }
 
   /**
-   * indexes the custom field params extracting the options from the custom field and building a Document (to use in Lucene Indexing)
+   * indexes the custom field params extracting the options from the custom field and building a
+   * Document (to use in Lucene Indexing)
+   * 
    * @param doc
    * @param issue
    * @param indexType
@@ -75,8 +74,9 @@ public class ValueLeadMultiLevelCascadingSelectIndexer extends AbstractCustomFie
   }
 
   /**
-   * indexes all the info contained in all child-level of the custom field.
-   * Remember that the Multi level cascading select allows you to create n levels of children from the parent node.
+   * indexes all the info contained in all child-level of the custom field. Remember that the Multi
+   * level cascading select allows you to create n levels of children from the parent node.
+   * 
    * @param customFieldParams
    * @param doc
    * @param indexType
@@ -100,9 +100,9 @@ public class ValueLeadMultiLevelCascadingSelectIndexer extends AbstractCustomFie
     }
   }
 
-  
   /**
    * indexes the Parent Option value in the Lucene Doc.
+   * 
    * @param customFieldParams
    * @param doc
    * @param indexType
@@ -115,13 +115,9 @@ public class ValueLeadMultiLevelCascadingSelectIndexer extends AbstractCustomFie
     }
   }
 
-
-
   private void addField(final Document doc, final String indexFieldName, final String value, final Field.Index indexType) {
     doc.add(new Field(indexFieldName, value, Field.Store.YES, indexType));
   }
-
-
 
   private Option getOpt(final Collection values) throws NumberFormatException {
     if (values == null || values.isEmpty()) {

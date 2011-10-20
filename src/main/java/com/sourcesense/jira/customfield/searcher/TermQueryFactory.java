@@ -21,7 +21,7 @@ final class TermQueryFactory
      * @param fieldName the index field to be non empty
      * @return the term query <code>nonemptyfieldids:fieldName</code>
      */
-    static Query nonEmptyQuery(final String fieldName)
+  static Query nonEmptyQuery(final String fieldName)
     {
         return new TermQuery(new Term(DocumentConstants.ISSUE_NON_EMPTY_FIELD_IDS, fieldName));
     }

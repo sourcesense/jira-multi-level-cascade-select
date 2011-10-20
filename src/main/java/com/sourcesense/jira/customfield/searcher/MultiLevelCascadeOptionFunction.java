@@ -13,8 +13,10 @@ import java.util.Set;
 
 import com.atlassian.jira.JiraDataType;
 import com.atlassian.jira.JiraDataTypes;
+import com.atlassian.jira.ManagerFactory;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType;
+import com.atlassian.jira.issue.customfields.manager.OptionsManager;
 import com.atlassian.jira.issue.customfields.option.Option;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.search.managers.SearchHandlerManager;
@@ -59,7 +61,11 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
    */
   public static final String FUNCTION_CASCADE_OPTION = "multilevelcascadeOption";
 
-  public static String EMPTY_VALUE = "none";
+  public static String EMPTY_VALUE = "_none_";
+
+  public static String EMPTY_VALUE_ID = "-2";
+
+  public static long EMPTY_VALUE_ID_LONG = -2;
 
   public static String QUOTED_EMPTY_VALUE = "\"none\"";
 
@@ -68,6 +74,7 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
   private final SearchHandlerManager searchHandlerManager;
 
   private final CustomFieldManager customFieldManager;
+  private OptionsManager optionsManager;
 
   private final JqlCascadingSelectLiteralUtil jqlCascadingSelectLiteralUtil;
 
@@ -77,6 +84,7 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
     this.customFieldManager = notNull("customFieldManager", customFieldManager);
     this.searchHandlerManager = notNull("searchHandlerManager", searchHandlerManager);
     this.jqlSelectOptionsUtil = notNull("jqlSelectOptionsUtil", jqlSelectOptionsUtil);
+    this.optionsManager=ManagerFactory.getOptionsManager();
   }
 
   /**
@@ -154,7 +162,7 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
           parentOptions = childOptions;
         } else {
           childArg = cleanArg(childArg);
-          Set<Option> childOptions = getOptions(operand, fields, childArg);
+          Set<Option> childOptions = getOptions(operand, fields, childArg,parentOptions);
           for (Option child : childOptions)
             orderedOptions.addLast(child);
         }
@@ -234,7 +242,7 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
    *         function and were children of at least one of the specified parents.
    */
   private Collection<Option> getRepresentedChildrenOptions(final Operand operand, final Set<CustomField> fields, final Collection<Option> parentOptionList, final String childArg) {
-    final Set<Option> argumentOptions = getOptions(operand, fields, childArg);
+    final Set<Option> argumentOptions = getOptions(operand, fields, childArg,null);
     Set<Option> chosenOptions = new HashSet<Option>();
     chosenOptions.addAll(parentOptionList);
     chosenOptions.addAll(argumentOptions);
@@ -258,9 +266,8 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
    *         and those which are visible
    */
   private Collection<Option> getParentOptions(final Operand operand, final Set<CustomField> fields, final String optionArg) {
-    final Collection<Option> possibleParents = getOptions(operand, fields, optionArg);
-
-    // filter down the list of parents to those which are actually parents
+    final Collection<Option> possibleParents = getOptions(operand, fields, optionArg,null);
+ // filter down the list of parents to those which are actually parents
     Iterator<Option> parentIterator = possibleParents.iterator();
     while (parentIterator.hasNext()) {
       final Option parentOption = parentIterator.next();
@@ -279,12 +286,19 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
    *          the {@link com.atlassian.jira.issue.fields.CustomField}s to retreive the options from
    * @param optionArg
    *          the string argument representing an option
+   * @param parentOptions 
    * @return the intersection of the list of options represented by the argument and those which are
    *         visible
    */
-  private Set<Option> getOptions(final Operand operand, final Set<CustomField> fields, final String optionArg) {
+  private Set<Option> getOptions(final Operand operand, final Set<CustomField> fields, final String optionArg, Collection<Option> parentOptions) {
     final Set<Option> optionList = new HashSet<Option>();
-    for (CustomField customField : fields) {
+    //-2 is the none option, so we have to create an option that has only the purpose to pass the none information
+    if(optionArg.equals(EMPTY_VALUE_ID)&&parentOptions!=null)
+    {
+      Option none=optionsManager.createOption(parentOptions.iterator().next().getRelatedCustomField(),EMPTY_VALUE_ID_LONG,EMPTY_VALUE_ID_LONG,EMPTY_VALUE);
+      optionList.add(none);
+    }
+    else for (CustomField customField : fields) {
       optionList.addAll(jqlSelectOptionsUtil.getOptions(customField, new QueryLiteral(operand, optionArg), true));
     }
     return optionList;

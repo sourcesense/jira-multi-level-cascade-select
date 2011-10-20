@@ -17,6 +17,7 @@ $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
                 <option class="$parentid" value="-1">$i18n.getText("common.words.pleaseselect")</option>
             #end
             <option class="select" value="-1">$i18n.getText("common.filters.any")</option>
+            <option class="select" value="-2">$i18n.getText("none")</option>
         #end
         #foreach ($parentid in $parentMap.keySet())
             #if ($parentMap.get($parentid))
@@ -36,6 +37,7 @@ $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
         #if (!$fieldLayoutItem.required)
             <option value="-1">$i18n.getText("common.words.pleaseselect")</option>
             <option value="-1">$i18n.getText("common.filters.any")</option>
+      
         #end
         #set ($rootMap = $customList.get(null))
         #foreach ($option in $rootMap.get(null))
