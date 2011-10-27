@@ -44,6 +44,7 @@ import com.atlassian.jira.util.ComponentFactory;
 import com.atlassian.jira.util.ComponentLocator;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.bean.FieldVisibilityBean;
+import com.sourcesense.jira.customfield.searcher.indexer.MultiLevelCascadingSelectIndexer;
 import com.sourcesense.jira.customfield.statistic.MultiLevelCascadingSelectStatisticsMapper;
 
 /**
