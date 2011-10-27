@@ -49,7 +49,7 @@ import com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType;
  * 
  */
 @NonInjectableComponent
-public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends AbstractCustomFieldSearchInputTransformer{
+public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends AbstractCustomFieldSearchInputTransformer {
   private final ClauseNames clauseNames;
 
   private final CustomField customField;
@@ -63,6 +63,12 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
   private final JqlCascadingSelectLiteralUtil jqlCascadingSelectLiteralUtil;
 
   private final QueryContextConverter queryContextConverter;
+
+  public static String EMPTY_VALUE = "_none_";
+
+  public static String EMPTY_VALUE_ID = "-2";
+
+  public static long EMPTY_VALUE_ID_LONG = -2;
 
   public MultiLevelCascadingSelectCustomFieldSearchInputTransformer(final ClauseNames clauseNames, final CustomField field, final String urlParameterName, final SelectConverter selectConverter,
           final JqlOperandResolver jqlOperandResolver, final JqlSelectOptionsUtil jqlSelectOptionsUtil, final JqlCascadingSelectLiteralUtil jqlCascadingSelectLiteralUtil,
@@ -80,17 +86,19 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
   public boolean doRelevantClausesFitFilterForm(final User searcher, final Query query, final SearchContext searchContext) {
     return getParamsFromSearchRequest(searcher, query, searchContext) != null;
   }
-  
-  /*this method extracts the params for the input customField, extracting them from the ActionParams obj
-   * the current issue is: in the action params we don't have the parmas from the bugged customfields*/
+
+  /*
+   * this method extracts the params for the input customField, extracting them from the
+   * ActionParams obj the current issue is: in the action params we don't have the parmas from the
+   * bugged customfields
+   */
   @Override
-  public void populateFromParams(final User user, final FieldValuesHolder fieldValuesHolder, final ActionParams actionParams)
-  {
+  public void populateFromParams(final User user, final FieldValuesHolder fieldValuesHolder, final ActionParams actionParams) {
     String[] values = actionParams.getValuesForKey(customField.getId());
-    if (values!=null && values.length==1 && values[0]!=null) {
-        actionParams.put(customField.getId(), values[0].split(":"));
+    if (values != null && values.length == 1 && values[0] != null) {
+      actionParams.put(customField.getId(), values[0].split(":"));
     }
-      getCustomField().populateFromParams(fieldValuesHolder, actionParams.getKeysAndValues());
+    getCustomField().populateFromParams(fieldValuesHolder, actionParams.getKeysAndValues());
   }
 
   /**
@@ -106,9 +114,10 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
     for (String level : customFieldParams.getAllKeys()) {
       Long longOptionValue = null;
       String stringOptionValue = null;
-      if (level != null)
-        stringOptionValue = getValue(customFieldParams.getValuesForKey(level));
-      else
+      if (level != null) {
+        Collection<?> valuesForKey = customFieldParams.getValuesForKey(level);
+        stringOptionValue = getValue(valuesForKey);
+      } else
         stringOptionValue = getValue(customFieldParams.getValuesForKey(MultiLevelCascadingSelectCFType.PARENT_KEY));
       try {
         longOptionValue = new Long(stringOptionValue);
@@ -124,6 +133,13 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
           else
             levelNumber = 0;
           orderedFunctionArgs.put(levelNumber, option.getOptionId().toString());
+        } else if (longOptionValue == EMPTY_VALUE_ID_LONG) {
+          int levelNumber;
+          if (level != null)
+            levelNumber = Integer.parseInt(level);
+          else
+            levelNumber = 0;
+          orderedFunctionArgs.put(levelNumber, EMPTY_VALUE_ID);
         } else {
           invalidLongOperand = longOptionValue;
         }
@@ -206,7 +222,7 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
           counter--;
         }
       }
-      //secondo me sono al contrario????
+      // secondo me sono al contrario????
       return customFieldParams;
     }
 
@@ -237,7 +253,12 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
     if (values == null || values.isEmpty()) {
       return null;
     }
-    return selectConverter.getObject((String) values.iterator().next());
+    String value = (String) values.iterator().next();
+    // if the value is the none value id, we have only to return the id
+    if (value.equals(EMPTY_VALUE_ID))
+      return value;
+    else
+      return selectConverter.getObject(value);
   }
 
   // /CLOVER:OFF
