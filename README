@@ -10,4 +10,4 @@ ${project.description} for JIRA ${jira.version}
   You maybe received the `${project.artifactId}-${project.version}-${config}.zip` package,
   please copy all the files under `WEB-INF` directory to `${ATLASSIAN_HOME}/WEB_INF/`.
   Simply extract the plug-in in the Jira Directory and the new Multi Level Cascading Select Custom Field will be added.
-  21 may 2012
+
