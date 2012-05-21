@@ -19,7 +19,6 @@ import com.atlassian.jira.issue.customfields.view.CustomFieldParamsImpl;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.search.ClauseNames;
 import com.atlassian.jira.issue.search.SearchContext;
-import com.atlassian.jira.issue.search.searchers.transformer.SearchInputTransformer;
 import com.atlassian.jira.issue.search.searchers.transformer.SimpleNavigatorCollectorVisitor;
 import com.atlassian.jira.issue.transport.ActionParams;
 import com.atlassian.jira.issue.transport.FieldValuesHolder;
@@ -37,7 +36,7 @@ import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operand.Operand;
 import com.atlassian.query.operand.SingleValueOperand;
 import com.atlassian.query.operator.Operator;
-import com.opensymphony.user.User;
+import com.atlassian.crowd.embedded.api.User;
 import com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType;
 
 /**
@@ -115,7 +114,7 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
       Long longOptionValue = null;
       String stringOptionValue = null;
       if (level != null) {
-        Collection<?> valuesForKey = customFieldParams.getValuesForKey(level);
+        Collection<String> valuesForKey = customFieldParams.getValuesForKey(level);
         stringOptionValue = getValue(valuesForKey);
       } else
         stringOptionValue = getValue(customFieldParams.getValuesForKey(MultiLevelCascadingSelectCFType.PARENT_KEY));
@@ -201,7 +200,7 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
       }
 
       // check that the options resolved are in context
-      final QueryContext queryContext = queryContextConverter.getQueryContext(searchContext);
+      //final QueryContext queryContext = queryContextConverter.getQueryContext(searchContext);
       List<Option> options = new ArrayList<Option>();
       for (QueryLiteral l : literals)
         options.addAll(jqlSelectOptionsUtil.getOptions(customField, l, true));
@@ -249,11 +248,11 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
     return customFieldParams;
   }
 
-  private String getValue(final Collection values) throws NumberFormatException {
+  private String getValue(final Collection<String> values) throws NumberFormatException {
     if (values == null || values.isEmpty()) {
       return null;
     }
-    String value = (String) values.iterator().next();
+    String value = values.iterator().next();
     // if the value is the none value id, we have only to return the id
     if (value.equals(EMPTY_VALUE_ID))
       return value;
