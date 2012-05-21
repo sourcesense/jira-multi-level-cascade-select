@@ -11,9 +11,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+
 import com.atlassian.jira.JiraDataType;
 import com.atlassian.jira.JiraDataTypes;
-import com.atlassian.jira.ManagerFactory;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType;
 import com.atlassian.jira.issue.customfields.manager.OptionsManager;
@@ -31,7 +32,7 @@ import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operand.Operand;
-import com.opensymphony.user.User;
+import com.atlassian.crowd.embedded.api.User;
 
 /**
  * <p>
@@ -84,7 +85,7 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
     this.customFieldManager = notNull("customFieldManager", customFieldManager);
     this.searchHandlerManager = notNull("searchHandlerManager", searchHandlerManager);
     this.jqlSelectOptionsUtil = notNull("jqlSelectOptionsUtil", jqlSelectOptionsUtil);
-    this.optionsManager=ManagerFactory.getOptionsManager();
+    this.optionsManager=ComponentAccessor.getOptionsManager();
   }
 
   /**
@@ -140,7 +141,8 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
     LinkedList<Option> orderedOptions = new LinkedList<Option>();
     List<QueryLiteral> result = new ArrayList<QueryLiteral>();
     final List<String> args = operand.getArgs();
-    final Set<CustomField> fields = resolveField(queryCreationContext.isSecurityOverriden(), queryCreationContext.getUser(), terminalClause.getName());
+    com.atlassian.crowd.embedded.api.User user = queryCreationContext.getUser();
+    final Set<CustomField> fields = resolveField(queryCreationContext.isSecurityOverriden(), user, terminalClause.getName());
     if (!args.isEmpty() && !fields.isEmpty()) {
       String parent = args.get(0);
       if (isEmptyArg(parent)) {
@@ -240,7 +242,7 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
    *          the String representation of the child from the function arguments
    * @return the collection of children options which were represented by the child argument of the
    *         function and were children of at least one of the specified parents.
-   */
+   
   private Collection<Option> getRepresentedChildrenOptions(final Operand operand, final Set<CustomField> fields, final Collection<Option> parentOptionList, final String childArg) {
     final Set<Option> argumentOptions = getOptions(operand, fields, childArg,null);
     Set<Option> chosenOptions = new HashSet<Option>();
@@ -250,10 +252,10 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
      * for (Option parentOption : parentOptionList) { final List<Option> children =
      * parentOption.getChildOptions(); chosenOptions.addAll(intersection(children,
      * argumentOptions)); }
-     */
+     
 
     return chosenOptions;
-  }
+  }*/
 
   /**
    * @param operand
@@ -304,21 +306,5 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
     return optionList;
   }
 
-  /**
-   * @param c1
-   *          the first collection
-   * @param c2
-   *          the second collection
-   * @return the set (ie no duplicates) of elements T that are contained in both c1 and c2; never
-   *         null.
-   */
-  private static <T> Set<T> intersection(Collection<T> c1, Collection<T> c2) {
-    Set<T> intersection = new HashSet<T>();
-    for (T t : c1) {
-      if (c2.contains(t)) {
-        intersection.add(t);
-      }
-    }
-    return intersection;
-  }
+ 
 }
