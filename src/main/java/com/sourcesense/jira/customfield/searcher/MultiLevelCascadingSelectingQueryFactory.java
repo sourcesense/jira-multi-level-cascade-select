@@ -14,7 +14,8 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
-import com.atlassian.jira.ManagerFactory;
+
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.customfields.manager.OptionsManager;
 import com.atlassian.jira.issue.customfields.option.Option;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -72,7 +73,7 @@ public class MultiLevelCascadingSelectingQueryFactory implements ClauseQueryFact
     this.jqlCascadingSelectLiteralUtil = notNull("jqlCascadingSelectLiteralUtil", jqlCascadingSelectLiteralUtil);
     this.parentFieldName = notBlank("luceneField", luceneField);
     this.childFieldName = notBlank("luceneField", luceneField) + ":";
-    this.optionsManager=ManagerFactory.getOptionsManager();
+    this.optionsManager=ComponentAccessor.getOptionsManager();
   }
 
   /**

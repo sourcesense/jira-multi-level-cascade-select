@@ -16,7 +16,7 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.Operand;
-import com.opensymphony.user.User;
+import com.atlassian.crowd.embedded.api.User;
 
 /**
  * A validator for select custom fields. Takes into account if the user has any context under which

@@ -7,11 +7,10 @@ import com.atlassian.jira.jql.operand.JqlOperandResolver;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.util.JqlSelectOptionsUtil;
 import com.atlassian.jira.jql.validator.ClauseValidator;
-import com.atlassian.jira.jql.validator.SelectCustomFieldValidator;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.NonInjectableComponent;
 import static com.atlassian.jira.util.dbc.Assertions.notNull;
-import com.opensymphony.user.User;
+import com.atlassian.crowd.embedded.api.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class MultiLevelCascadingSelectCustomFieldValidator extends MultiSelectCu
         this.jqlSelectOptionsUtil = notNull("jqlSelectOptionsUtil", jqlSelectOptionsUtil);
     }
 
-    @Override
+    
     protected List<Option> getOptionsFromLiteral(final User searcher, final QueryLiteral literal)
     {
         final List<Option> options = new ArrayList<Option>();

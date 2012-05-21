@@ -7,7 +7,7 @@ import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.jira.web.bean.I18nBean;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operator.Operator;
-import com.opensymphony.user.User;
+import com.atlassian.crowd.embedded.api.User;
 
 import java.util.Collection;
 import java.util.Collections;

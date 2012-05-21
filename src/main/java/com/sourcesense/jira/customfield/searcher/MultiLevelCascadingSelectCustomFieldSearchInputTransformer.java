@@ -22,7 +22,6 @@ import com.atlassian.jira.issue.search.SearchContext;
 import com.atlassian.jira.issue.search.searchers.transformer.SimpleNavigatorCollectorVisitor;
 import com.atlassian.jira.issue.transport.ActionParams;
 import com.atlassian.jira.issue.transport.FieldValuesHolder;
-import com.atlassian.jira.jql.context.QueryContext;
 import com.atlassian.jira.jql.operand.JqlOperandResolver;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.util.JqlCascadingSelectLiteralUtil;
@@ -61,7 +60,6 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
 
   private final JqlCascadingSelectLiteralUtil jqlCascadingSelectLiteralUtil;
 
-  private final QueryContextConverter queryContextConverter;
 
   public static String EMPTY_VALUE = "_none_";
 
@@ -73,7 +71,7 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
           final JqlOperandResolver jqlOperandResolver, final JqlSelectOptionsUtil jqlSelectOptionsUtil, final JqlCascadingSelectLiteralUtil jqlCascadingSelectLiteralUtil,
           final QueryContextConverter queryContextConverter, final CustomFieldInputHelper customFieldInputHelper) {
     super(field, urlParameterName, customFieldInputHelper);
-    this.queryContextConverter = notNull("queryContextConverter", queryContextConverter);
+    //this.queryContextConverter = notNull("queryContextConverter", queryContextConverter);
     this.jqlCascadingSelectLiteralUtil = notNull("jqlCascadingSelectLiteralUtil", jqlCascadingSelectLiteralUtil);
     this.clauseNames = notNull("clauseNames", clauseNames);
     this.customField = notNull("field", field);
