@@ -51,9 +51,7 @@ public class MutableOption implements Option {
         option.setSequence(sequence);
     }
 
-    public List retrieveAllChildren(List listToAddTo) {
-        return option.retrieveAllChildren(listToAddTo);
-    }
+ 
 
     public void store() {
         option.store();
@@ -67,5 +65,23 @@ public class MutableOption implements Option {
     public String toString()
     {
         return option.toString();
+    }
+
+    @Override
+    public Boolean getDisabled() {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public List<Option> retrieveAllChildren(List<Option> listToAddTo) {
+        return option.retrieveAllChildren(listToAddTo);
+    
+    }
+
+    @Override
+    public void setDisabled(Boolean arg0) {
+      // TODO Auto-generated method stub
+      
     }
 }

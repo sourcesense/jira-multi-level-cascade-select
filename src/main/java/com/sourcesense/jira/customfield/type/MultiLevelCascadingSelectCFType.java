@@ -43,10 +43,13 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
 
   private final JqlSelectOptionsUtil jqlSelectOptionsUtil;
 
+  private OptionsManager optionsManager;
+
   public MultiLevelCascadingSelectCFType(OptionsManager optionsManager, CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager,
           JqlSelectOptionsUtil jqlSelectOptionsUtil) {
-    super(optionsManager, customFieldValuePersister, genericConfigManager);
+    super(optionsManager, customFieldValuePersister, genericConfigManager,null);//null is a test value for JiraBaseUrls
     this.jqlSelectOptionsUtil = notNull("jqlSelectOptionsUtil", jqlSelectOptionsUtil);
+    this.optionsManager=optionsManager;
   }
 
   public boolean equalsOption(Option op1, Option op2) {
@@ -72,7 +75,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
    * @return
    */
   public boolean optionValidForConfig(FieldConfig config, Option option) {
-    final Options options = ManagerFactory.getOptionsManager().getOptions(config);
+    final Options options =optionsManager.getOptions(config);
     if (options != null && option != null) {
       Option realOption = options.getOptionById(option.getOptionId());
       return equalsOption(realOption, option);
@@ -116,7 +119,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
       return (Option) value;
     }
     if (value instanceof String && EMPTY_VALUE_ID.equals(value)) {
-      return super.optionsManager.createOption(config, EMPTY_VALUE_ID_LONG, EMPTY_VALUE_ID_LONG, EMPTY_VALUE);
+      return this.optionsManager.createOption(config, EMPTY_VALUE_ID_LONG, EMPTY_VALUE_ID_LONG, EMPTY_VALUE);
     } else if (value instanceof String && !"-1".equals(value)) {
       return (Option) this.getSingularObjectFromString((String) value);
     }

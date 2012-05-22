@@ -29,9 +29,9 @@
         <developerConnection>scm:git:git@github.com:sourcesense/jira-multi-level-cascade-select.git</developerConnection>
         <url>http://github.com/sourcesense/jira-multi-level-cascade-select</url>
     </scm>
-
     <properties>
-        <jira.version>4.3.2</jira.version>
+        <jira.version>5.0.4</jira.version>
+        <amps.version>3.10.3</amps.version>
         <javac.src.version>1.6</javac.src.version>
         <javac.target.version>1.6</javac.target.version>
     </properties>
@@ -58,11 +58,11 @@
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.4</version>
             </plugin>
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.4</version>
             </plugin>
 
             <plugin>
@@ -222,39 +222,45 @@
             </dependencies>
         </profile>
     </profiles>
-
-    <dependencies>
-        <!--
-         | provided
-        -->
+<dependencies>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
-            <artifactId>atlassian-jira</artifactId>
+            <artifactId>jira-api</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!--
-         | test
-        -->
+        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
+        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
+        
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-core</artifactId>
+            <version>${jira.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-tests</artifactId>
+            <version>${jira.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-func-tests</artifactId>
             <version>${jira.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-            <groupId>easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>1.0</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

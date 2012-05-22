@@ -22,7 +22,7 @@ import com.atlassian.jira.jql.builder.JqlClauseBuilder;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.util.JqlCustomFieldId;
 import com.atlassian.query.operator.Operator;
-import com.opensymphony.user.User;
+import com.atlassian.crowd.embedded.api.User;
 import com.sourcesense.jira.customfield.MultiLevelCascadingSelectComparator;
 import com.sourcesense.jira.customfield.MultiLevelCascadingSelectValue;
 
