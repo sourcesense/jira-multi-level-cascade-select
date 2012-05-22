@@ -1,4 +1,4 @@
-package com.sourcesense.jira.customfield.config;
+package com.sourcesense.jira.customfield.admin_config;
 
 import java.util.ArrayList;
 import java.util.Arrays;

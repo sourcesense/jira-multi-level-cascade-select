@@ -26,11 +26,11 @@ import com.atlassian.jira.util.EasyList;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraUtils;
 import com.sourcesense.jira.common.OptionsMap;
-import com.sourcesense.jira.customfield.config.SettableMultiLevelOptionsConfigItem4;
+import com.sourcesense.jira.customfield.admin_config.SettableMultiLevelOptionsConfigItem4;
 
 /**
  * This class represents the MultiLevelCascading Select Custom Field Type.
- * 
+ * Rimane il dubbio se è compatibile tutta la classe con 5.0 o se devo riscriverla secondo questa linea , attendo source code
  * @author Alessandro Benedetti
  */
 
@@ -51,7 +51,9 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
     this.jqlSelectOptionsUtil = notNull("jqlSelectOptionsUtil", jqlSelectOptionsUtil);
     this.optionsManager=optionsManager;
   }
-
+/*
+ * Ok 5.0
+ * */
   public boolean equalsOption(Option op1, Option op2) {
     if (op1 == null || op2 == null) {
       return op1 == op2;
@@ -69,7 +71,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
   /**
    * takes in input a fileConfig and an Option, then it extracts the list of options from the input
    * config and from this list ,it checks if the input option belong to the selected Set.
-   * 
+   * Ok 5.0
    * @param config
    * @param option
    * @return
@@ -86,7 +88,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
   /**
    * checks the input Option verifying that: 1)it's null 2)it's valid for the input FileConfig
    * 3)it's son of the parent in input
-   * 
+   * Ok 5.0
    * @param customFieldId
    * @param option
    * @param parentOption
@@ -109,7 +111,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
 
   /**
    * trasforms the object(Option) in input in an Option.
-   * 
+   * Ok 5.0
    * @param value
    * @param object
    * @return
@@ -125,7 +127,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
     }
     return null;
   }
-
+  /*Ok 5.0*/
   public void validateFromParams(CustomFieldParams relevantParams, ErrorCollection errorCollectionToAddTo, FieldConfig config) {
     log.debug("Pre- Validate Error collection: [" + errorCollectionToAddTo.getErrors() + "]");
 
@@ -175,7 +177,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
   /**
    * add to the default file Config the specific ConfigItem for the multi level cascading select
    * custom field
-   * 
+   * Ok 5.0
    * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#getConfigurationItemTypes()
    */
   @Override
@@ -196,12 +198,13 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
    * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#getVelocityParameters(com.atlassian.jira.issue.Issue,
    *      com.atlassian.jira.issue.fields.CustomField,
    *      com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem)
+   *
+   *Ok 5.0
    */
   @Override
   public Map getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-
+    System.out.println("Are we here?");
     Map map = super.getVelocityParameters(issue, field, fieldLayoutItem);
-
     map.put("mlcscftype", this);
     map.put("fieldLayout", fieldLayoutItem);
     return map;
