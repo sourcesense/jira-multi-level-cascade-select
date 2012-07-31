@@ -8,18 +8,16 @@ $!request.setAttribute("multilevelcascade" , "true")
 
 #controlHeader ($action $customField.id $customField.name $fieldLayoutItem.required $displayParameters.noHeader)
 
-## #set ($selectedParent = "")
-## #if ($value.getValuesForKey(null) && !$value.getValuesForKey(null).empty)
-##     #set ($selectedParent = $value.getValuesForKey(null).iterator().next())
-## #end
-## 
-## #set ($selectedChild = "")
-## #if ($value.getValuesForKey('1') && !$value.getValuesForKey('1').empty)
-##     #set ($selectedChild = $value.getValuesForKey('1').iterator().next())
-## #end
+##this macro render the select list for viewing in edit and create mask
+## prende in ingresso una stringa che identifica il livello, l'id del custom field ed una mappa a cui viene associato al livello la lista delle option
+## key -> livello ( es: "1", "2", "3"
+## customfieldid -> id del custom field
+## levels -> la mappa livello -> lista option per quel livello
 
 #macro(renderSelect $key $customfieldid $levels)
     #if ($levels.get($key))
+        #set($Integer = 0)
+        ##parentMap è la lista delle opzioni per il livello in input da key
         #set ($parentMap = $levels.get($key))
         <select name="$customfieldid:$key" id="$customfieldid:$key">
         #if (!$fieldLayoutItem.required)
@@ -28,59 +26,78 @@ $!request.setAttribute("multilevelcascade" , "true")
             #end
             <option class="select" value="-1">$i18n.getText("common.filters.any")</option>
         #end
-        #foreach ($parentid in $parentMap.keySet())
+            #foreach ($parentid in $parentMap.keySet())
             #if ($parentMap.get($parentid))
+            ## mi sto scorrendo le opzioni per livello
                 #foreach ($option in $parentMap.get($parentid))
-                    <option class="$parentid" value="$option.optionId">$option.value</option>
+                    <option class="$parentid" value="$option.optionId"#if ((0<$selectedIds.size()&&$Integer.parseInt($key))<$selectedIds.size() && $selectedIds.get($Integer.parseInt($key)) && $selectedIds.get($Integer.parseInt($key)) == $option.optionId) selected="selected"#end>$option.value</option>
                 #end
             #end
         #end
+
         </select>
     #end
 #end
 
+
+
 #set ($customList = $mlcscftype.getOptionMapFromOptions($configs.options))
 
+##questo è il template principale, inizia a valorizzarsi solo il primo livello e poi affida allo scripting dinamico il resto
+## scriviamone una variante
 #if ($customList.get(null))
     <select name="${customField.id}" id="${customField.id}">
         #if (!$fieldLayoutItem.required)
             <option value="-1">$i18n.getText("common.words.pleaseselect")</option>
+            #end
             <option value="-1">$i18n.getText("common.filters.any")</option>
-        #end
         #set ($rootMap = $customList.get(null))
         #foreach ($option in $rootMap.get(null))
-            <option value="$option.optionId">$option.value</option>
+                <option value="$option.optionId">$cfValueEncoder.encodeForHtml($option.value)</option>  
         #end
     </select>
-
-    #foreach($id in [1..10])
+    ##voglio prima scrivere tutte le option, su cui agire e poi voglio scatenare il dynamic
+    #foreach ($id in [1..10])
         #set($key = $id.toString())
         #if ($customList.get($key))
+            #set($parId = $id - 1)
             #renderSelect ($key ${customField.id} $customList)
+        #end
+    #end
+    ##questa parte va eseguita dopo o script si spera
+    #foreach ($id in [0..10])
+        #set($key = $id.toString())
+        #if ($customList.get($key))
+            
             #if ($id > 1)
                 #set ($script = "$!script dynamicMultiLevelSelect('${customField.id}\\:$prevkey', '${customField.id}\\:$key');")
+            #else
+                #set ($script = "$!script dynamicMultiLevelSelect('${customField.id}', '${customField.id}\\:$key');")    
             #end
         #end
         #set ($prevkey = $key)
     #end
 #end
 
+
 #controlFooter ($action $fieldLayoutItem.fieldDescription $displayParameters.noHeader)
 
 <script>
-    dynamicMultiLevelSelect('${customField.id}', '${customField.id}\\:1');
     $!script
-#if ($value.getValuesForKey(null) && !$value.getValuesForKey(null).empty)
-    #set ($selectedParent = $value.getValuesForKey(null).iterator().next())
-    selectOption("select#${customField.id}", $selectedParent);
-    #foreach($id in [1..10])
-        #set($key = $id.toString())
-        #if ($value.getValuesForKey($key) && !$value.getValuesForKey($key).empty)
-            #set ($selectedChild = $value.getValuesForKey($key).iterator().next())
-            selectOption("select#${customField.id}\\:$!key", $selectedChild);
+#if ($selectedIds.size()>0)
+    #set ($selectedParent = $selectedIds.get(0))
+    selectOption("select#${customField.id}", $selectedParent,0);
+    #set($length = ($selectedIds.size()- 1))
+    #foreach ($i in [1..$length])
+        #if ($selectedIds.get($i))
+            #set ($selectedChild = $selectedIds.get($i))
+            #set ($previousId = $i - 1)
+            #set ($selectedParent = $selectedIds.get($previousId))
+            selectOption("select#${customField.id}\\:$!i", $selectedChild,$selectedParent);
         #end
     #end
 #else
     clickFirstVisible("select#${customField.id}");
 #end
+##dynamicMultiLevelSelect('${customField.id}', '${customField.id}\\:1');
 </script>

@@ -1,17 +1,11 @@
-#if ($value)
+#if ($value.get("0"))
     #set($prefix = "")
-    #foreach ($id in [0..10])
-        #if($id > 0)
-            #set($key = $id.toString())
+    #set($length = ($value.size()- 1))
+    #foreach ($id in [0..$length])
+        #set ($childValue = $value.get($id.toString()))
+        #if ($childValue)
+        	$prefix $cfValueEncoder.encodeForHtml($!childValue.value)
+        	#set($prefix = " - ")
         #end
-
-        #if ($value.getValuesForKey($key) && $value.getValuesForKey($key).isEmpty() == false)
-            #set ($singlevalue = $value.getValuesForKey($key).iterator().next())
-            #if ($singlevalue)
-                ${prefix}$singlevalue.value
-            #end
-        #end
-        #set($prefix = " - ")
-    #end
+    #end    
 #end
-

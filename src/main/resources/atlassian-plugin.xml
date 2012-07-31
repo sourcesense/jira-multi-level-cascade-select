@@ -40,7 +40,7 @@
     <webwork1 key="action-multi-level-cascading-select" name="Multi level cascading select configuration">
         <description>Multi level cascading select configuration.</description>
         <actions>
-            <action name="com.sourcesense.jira.customfield.config.EditCustomFieldMultiLevelOptions" alias="EditCustomFieldMultiLevelOptions"
+            <action name="com.sourcesense.jira.customfield.admin_config.EditCustomFieldMultiLevelOptions" alias="EditCustomFieldMultiLevelOptions"
                     roles-required="admin">
                 <view name="input">/secure/admin/views/customfields/editcustomfieldmultileveloptions.jsp</view>
                 <view name="error">/secure/admin/views/customfields/editcustomfieldmultileveloptions.jsp</view>
