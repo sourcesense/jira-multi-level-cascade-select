@@ -17,6 +17,8 @@ public class OptionsMap implements Map {
  
     private TreeMap map = new TreeMap(new OptionsMapKeyComparator());
 
+    /*
+     * this OptionMap is created to obtain the map of all the levels, does not contain the selecion of the user*/
     public OptionsMap(Options options) {
         super();
         putOptions(options);

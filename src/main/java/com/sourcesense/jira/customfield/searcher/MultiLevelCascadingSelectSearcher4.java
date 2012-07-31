@@ -94,7 +94,6 @@ public class MultiLevelCascadingSelectSearcher4 extends AbstractInitializationCu
     final FieldIndexer indexer = new MultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
     //final FieldIndexer indexer = new ValueLeadMultiLevelCascadingSelectIndexer(fieldVisibilityManager, field, jqlSelectOptionsUtil, selectConverter);
     final CustomFieldValueProvider customFieldValueProvider = new DefaultCustomFieldValueProvider();
-
     this.searcherInformation = new CustomFieldSearcherInformation(field.getId(), field.getNameKey(), Collections.<FieldIndexer> singletonList(indexer), new AtomicReference<CustomField>(field));
     this.searchRenderer = new CustomFieldRenderer(names, getDescriptor(), field, customFieldValueProvider, fieldVisibilityManager);
     this.searchInputTransformer = new MultiLevelCascadingSelectCustomFieldSearchInputTransformer(names, field, searcherInformation.getId(), selectConverter, jqlOperandResolver, jqlSelectOptionsUtil,
