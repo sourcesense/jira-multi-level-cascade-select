@@ -17,6 +17,16 @@ DOWNLOADS
 COMMERCIAL SUPPORT
 
 If you are looking for commercial support for this plugin {{{mailto://info@sourcesense.com?subject=Multicascade}contact us}}, we will be happy to oblige!
+
+* 2.6-SNAPSHOT
+  This version is compatible with JIRA \= 5.0
+
+*----------*--------------*----------------:
+| | DATE | DOWNLOAD |
+*----------*--------------*----------------:
+| Multi Level Cascade Select 2.6 (tar.gz) | 31/07/2012     | {{{./bin/2.6-SNAPSHOT/cascadingselect-2.6-SNAPSHOT-bundle.tar.gz}cascadingselect-2.6-SNAPSHOT-bundle.tar.gz}} |
+*----------*--------------*----------------:
+| Multi Level Cascade Select 2.6 (zip) | 31/07/2012     | {{{./bin/2.6-SNAPSHOT/cascadingselect-2.6-SNAPSHOT-bundle.zip}cascadingselect-2.6-SNAPSHOT-bundle.zip}} |
   
 * 2.5-SNAPSHOT
   This version is compatible with JIRA \> 4.3
