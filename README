@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
-${project.name} ${project.version} "${config}" (${build.version})
-${project.description} for JIRA 5
+Multilevel Cascade Select 2.6 for JIRA 5
 ------------------------------------------------------------------------
 
 Site : http://sourcesense.github.com/jira-multi-level-cascade-select/index.html
@@ -9,11 +8,11 @@ Site : http://sourcesense.github.com/jira-multi-level-cascade-select/index.html
  
  Welcome to Jira Multi level cascade select plug in !!!
 
-Multi Level Cascade Select Plug in is a Plug In for the Atlassian Jira issue Tracker,
-that models a new custom field.
-The new custom field allows you to have a cascading select with a multi level selection.
+ Multi Level Cascade Select Plug in is a Plug In for the Atlassian Jira issue Tracker,
+ that models a new custom field.
+ The new custom field allows you to have a cascading select with a multi level selection.
 
-If you are upgrading from versions < 2.4, you need to rebuild the JIRA index
+ If you are upgrading from versions < 2.4, you need to rebuild the JIRA index
 
 == Sys admins ==
 
