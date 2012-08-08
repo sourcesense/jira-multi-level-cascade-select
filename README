@@ -3,7 +3,7 @@ ${project.name} ${project.version} "${config}" (${build.version})
 ${project.description} for JIRA ${jira.version}
 ------------------------------------------------------------------------
 
- 5 seconds tutorial =
+ 5 seconds tutorial test =
 
 == Sys admins ==
 
