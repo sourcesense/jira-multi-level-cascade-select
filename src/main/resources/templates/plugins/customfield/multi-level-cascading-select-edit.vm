@@ -30,7 +30,7 @@ $!request.setAttribute("multilevelcascade" , "true")
             #if ($parentMap.get($parentid))
             ## mi sto scorrendo le opzioni per livello
                 #foreach ($option in $parentMap.get($parentid))
-                    <option class="$parentid" value="$option.optionId"#if ((0<$selectedIds.size()&&$Integer.parseInt($key))<$selectedIds.size() && $selectedIds.get($Integer.parseInt($key)) && $selectedIds.get($Integer.parseInt($key)) == $option.optionId) selected="selected"#end>$option.value</option>
+                    <option class="$parentid" value="$option.optionId"#if ((0<$selectedIds.size()) && ($Integer.parseInt($key)<$selectedIds.size()) && $selectedIds.get($Integer.parseInt($key)) && $selectedIds.get($Integer.parseInt($key)) == $option.optionId) selected="selected"#end>$option.value</option>
                 #end
             #end
         #end

@@ -46,492 +46,476 @@ import com.sourcesense.jira.customfield.admin_config.SettableMultiLevelOptionsCo
 /**
  * This class represents the MultiLevelCascading Select Custom Field Type.
  * Rimane il dubbio se è compatibile tutta la classe con 5.0 o se devo riscriverla secondo questa linea , attendo source code
+ *
  * @author Alessandro Benedetti
  */
 
 public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
-  public static String EMPTY_VALUE = "_none_";
+    public static String EMPTY_VALUE = "_none_";
 
-  public static String EMPTY_VALUE_ID = "-2";
+    public static String EMPTY_VALUE_ID = "-2";
 
-  public static long EMPTY_VALUE_ID_LONG = -2;
+    public static long EMPTY_VALUE_ID_LONG = -2;
 
-  private final JqlSelectOptionsUtil jqlSelectOptionsUtil;
+    private final JqlSelectOptionsUtil jqlSelectOptionsUtil;
 
-  private final OptionsManager optionsManager;
-  private final CustomFieldValuePersister customFieldValuePersister;
-  private final GenericConfigManager genericConfigManager;
-  private final JiraBaseUrls jiraBaseUrls;
+    private final OptionsManager optionsManager;
+    private final CustomFieldValuePersister customFieldValuePersister;
+    private final GenericConfigManager genericConfigManager;
+    private final JiraBaseUrls jiraBaseUrls;
 
-  public MultiLevelCascadingSelectCFType(OptionsManager optionsManager, CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager,
-          JqlSelectOptionsUtil jqlSelectOptionsUtil,JiraBaseUrls jiraBaseUrls) {
-    super(optionsManager, customFieldValuePersister, genericConfigManager,jiraBaseUrls);//null is a test value for JiraBaseUrls
-    this.jqlSelectOptionsUtil = notNull("jqlSelectOptionsUtil", jqlSelectOptionsUtil);
-    this.optionsManager=optionsManager;
-    this.customFieldValuePersister=customFieldValuePersister;
-    this.jiraBaseUrls=jiraBaseUrls;
-    this.genericConfigManager = genericConfigManager;
-  }
-  // --------------------------------------------------------------------------------------------- Persistance Methods
-
-  //these methods all operate on the object level
-
-  /**
-   * Create a cascading select-list instance for an issue.
-   *
-   * Updated 5.04 TO CHECK
-   * @param cascadingOptions
-   */
-  @Override
-  public void createValue(CustomField field, Issue issue, Map<String, Option> cascadingOptions)
-  {
-    Option currentOpt;
-    Option currentParent=null;
-    String parentId=null;
-    Set<String> levels = cascadingOptions.keySet();
-    for(int i=0;i<levels.size();i++){
-      currentOpt=cascadingOptions.get(""+i);
-      if(i>0){
-        currentParent=cascadingOptions.get(""+(i-1));
-        parentId=currentParent.getOptionId().toString();
-        }
-      if(currentOpt!=null){
-        customFieldValuePersister.createValues(field, issue.getId(), CASCADE_VALUE_TYPE, Lists.newArrayList(currentOpt.getOptionId().toString()), parentId);
-      }
-    }
-  }
-  
-  /**
-   * Updated to 5.04 TO CHECK
-   */
-  @Override
-  public void updateValue(CustomField field, Issue issue, Map<String, Option> cascadingOptions)
-  {
-      // clear old stuff first
-      customFieldValuePersister.updateValues(field, issue.getId(), CASCADE_VALUE_TYPE, null);
-      Option currentOpt;
-      Option currentParent=null;
-      String parentId=null;
-      Set<String> levels = cascadingOptions.keySet();
-      for(int i=0;i<levels.size();i++){
-        currentOpt=cascadingOptions.get(""+i);
-        if(i>0){
-          currentParent=cascadingOptions.get(""+(i-1));
-          parentId=currentParent.getOptionId().toString();
-          }
-        if(currentOpt!=null){
-          customFieldValuePersister.updateValues(field, issue.getId(), CASCADE_VALUE_TYPE, Lists.newArrayList(currentOpt.getOptionId().toString()), parentId);
-        }
-      }
-  }
-  
-  
-  
-  
-  
-  
-  
-/*
- * Ok 5.0
- * */
-  public boolean equalsOption(Option op1, Option op2) {
-    if (op1 == null || op2 == null) {
-      return op1 == op2;
+    public MultiLevelCascadingSelectCFType(
+            OptionsManager optionsManager,
+            CustomFieldValuePersister customFieldValuePersister,
+            GenericConfigManager genericConfigManager,
+            JqlSelectOptionsUtil jqlSelectOptionsUtil,
+            JiraBaseUrls jiraBaseUrls
+    ) {
+        super(optionsManager, customFieldValuePersister, genericConfigManager, jiraBaseUrls);//null is a test value for JiraBaseUrls
+        this.jqlSelectOptionsUtil = notNull("jqlSelectOptionsUtil", jqlSelectOptionsUtil);
+        this.optionsManager = optionsManager;
+        this.customFieldValuePersister = customFieldValuePersister;
+        this.jiraBaseUrls = jiraBaseUrls;
+        this.genericConfigManager = genericConfigManager;
     }
 
-    if (equalsOption(op1.getParentOption(), op2.getParentOption())) {
-      if (op1.getOptionId() == null) {
-        return op2.getOptionId() == null;
-      }
-      return (op1.getOptionId().equals(op2.getOptionId()));
-    }
-    return false;
-  }
+    // --------------------------------------------------------------------------------------------- Persistance Methods
 
-  /**
-   * takes in input a fileConfig and an Option, then it extracts the list of options from the input
-   * config and from this list ,it checks if the input option belong to the selected Set.
-   * Ok 5.0
-   * @param config
-   * @param option
-   * @return
-   */
-  public boolean optionValidForConfig(FieldConfig config, Option option) {
-    final Options options =optionsManager.getOptions(config);
-    if (options != null && option != null) {
-      Option realOption = options.getOptionById(option.getOptionId());
-      return equalsOption(realOption, option);
-    }
-    return false;
-  }
+    //these methods all operate on the object level
 
-  /**
-   * checks the input Option verifying that: 1)it's null 2)it's valid for the input FileConfig
-   * 3)it's son of the parent in input
-   * Ok 5.0
-   * @param customFieldId
-   * @param option
-   * @param parentOption
-   * @param errorCollectionToAddTo
-   * @param config
-   * @return
-   */
-  private boolean checkOption(String customFieldId, Option option, Option parentOption, ErrorCollection errorCollectionToAddTo, FieldConfig config) {
-    if (option == null) {
-      errorCollectionToAddTo.addError(customFieldId, getI18nBean().getText("admin.errors.option.invalid.parent", "'" + parentOption + "'", "'" + config.getName() + "'"));
-      return false;
-    }
-    if (!optionValidForConfig(config, option)) {
-      errorCollectionToAddTo.addError(customFieldId, getI18nBean().getText("admin.errors.option.invalid.for.context", "'" + parentOption + "'", "'" + config.getName() + "'"));
-      return false;
-    }
-
-    return true;
-  }
-
- 
-  /*Ok 5.0*/
-  public void validateFromParams(CustomFieldParams relevantParams, ErrorCollection errorCollectionToAddTo, FieldConfig config) {
-    log.debug("Pre- Validate Error collection: [" + errorCollectionToAddTo.getErrors() + "]");
-
-    if (relevantParams == null || relevantParams.isEmpty()) {
-      return;
-    }
-
-    Option parentOption = null;
-    String customFieldId = config.getCustomField().getId();
-    int count = relevantParams.getAllKeys().size();
-    for (int i = 0; i < count; i++) {
-      Option option1 = trasformToOption(config, relevantParams.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
-      if (option1 != null && !option1.toString().contains(":") && !option1.toString().equals(EMPTY_VALUE)) {
-        if (option1 != null) {
-          log.debug("check option: [" + option1 + "]");
-          if (!checkOption(customFieldId, option1, parentOption, errorCollectionToAddTo, config)) {
-            return;
-          }
-        }
-        parentOption = option1;
-      } else {
-        Collection<String> valueStrings = relevantParams.getAllValues();
-        String[] splittedStrings = null;
-        for (String s : valueStrings) {
-          splittedStrings = s.split(":");
-        }
-        for (int j = 0; j < splittedStrings.length; j++) {
-          // this part probably is useless, but for sure is not useful for "none" options
-          if (!splittedStrings[j].equals(EMPTY_VALUE_ID)) {
-            Long longOptionValue = new Long(splittedStrings[j]);
-            Option option = jqlSelectOptionsUtil.getOptionById(longOptionValue);
-            if (option != null) {
-              log.debug("check option: [" + option + "]");
-              if (!checkOption(customFieldId, option, parentOption, errorCollectionToAddTo, config)) {
-                return;
-              }
+    /**
+     * Create a cascading select-list instance for an issue.
+     * <p/>
+     * Updated 5.04 TO CHECK
+     */
+    @Override
+    public void createValue(CustomField field, Issue issue, Map<String, Option> cascadingOptions) {
+        Option currentOpt;
+        Option currentParent;
+        String parentId = null;
+        Set<String> levels = cascadingOptions.keySet();
+        for (int i = 0; i < levels.size(); i++) {
+            currentOpt = cascadingOptions.get("" + i);
+            if (i > 0) {
+                currentParent = cascadingOptions.get("" + (i - 1));
+                parentId = currentParent.getOptionId().toString();
             }
-            parentOption = option;
-          }
+            if (currentOpt != null) {
+                customFieldValuePersister.createValues(field, issue.getId(), CASCADE_VALUE_TYPE, Lists.newArrayList(currentOpt.getOptionId().toString()), parentId);
+            }
+        }
+    }
+
+    /**
+     * Updated to 5.04 TO CHECK
+     */
+    @Override
+    public void updateValue(CustomField field, Issue issue, Map<String, Option> cascadingOptions) {
+        // clear old stuff first
+        customFieldValuePersister.updateValues(field, issue.getId(), CASCADE_VALUE_TYPE, null);
+
+        if (cascadingOptions != null) {
+            Option currentOpt;
+            Option currentParent;
+            String parentId = null;
+            Set<String> levels = cascadingOptions.keySet();
+            for (int i = 0; i < levels.size(); i++) {
+                currentOpt = cascadingOptions.get("" + i);
+                if (i > 0) {
+                    currentParent = cascadingOptions.get("" + (i - 1));
+                    parentId = currentParent.getOptionId().toString();
+                }
+                if (currentOpt != null) {
+                    customFieldValuePersister.updateValues(field, issue.getId(), CASCADE_VALUE_TYPE, Lists.newArrayList(currentOpt.getOptionId().toString()), parentId);
+                }
+            }
+        }
+    }
+
+
+    /*
+     * Ok 5.0
+     */
+    public boolean equalsOption(Option op1, Option op2) {
+        if (op1 == null || op2 == null) {
+            return op1 == op2;
         }
 
-      }
+        if (equalsOption(op1.getParentOption(), op2.getParentOption())) {
+            if (op1.getOptionId() == null) {
+                return op2.getOptionId() == null;
+            }
+            return (op1.getOptionId().equals(op2.getOptionId()));
+        }
+        return false;
     }
-    log.debug("Post-Validate Error collection: [" + errorCollectionToAddTo.getErrors() + "]");
-  }
 
-  /**
-   * add to the default file Config the specific ConfigItem for the multi level cascading select
-   * custom field
-   * Ok 5.0
-   * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#getConfigurationItemTypes()
-   */
-  @Override
-  public List getConfigurationItemTypes() {
-    final List configurationItemTypes = EasyList.build(JiraUtils.loadComponent(DefaultValueConfigItem.class));
-    configurationItemTypes.add(new SettableMultiLevelOptionsConfigItem4(optionsManager));
-    return configurationItemTypes;
-  }
-
-  public OptionsMap getOptionMapFromOptions(Options options) {
-
-    return new OptionsMap(options);
-  }
-
-  /**
-   * return the velocity parameter for the issue and custom field in input no woking for bugged
-   * 
-   * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#getVelocityParameters(com.atlassian.jira.issue.Issue,
-   *      com.atlassian.jira.issue.fields.CustomField,
-   *      com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem)
-   *
-   *Ok 5.0
-   */
-  @Override
-  public Map<String, Object> getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-    System.out.println("Are we here?");
-    Map map = super.getVelocityParameters(issue, field, fieldLayoutItem);
-    map.put("mlcscftype", this);
-    
-    //mi creo ArrayList con gli id delle option
-    
-    
-    Map<String, Option> valueFromIssue = this.getValueFromIssue(field, issue);
-    Map<Long, Option> id2option =new HashMap<Long,Option>();
-    ArrayList<Long> selectedIds=new ArrayList<Long>(valueFromIssue.size());
-    for(int i=0;i<valueFromIssue.size();i++){
-      Option currentOption = valueFromIssue.get(""+i);
-      if (currentOption!=null) {
-        Long currentOptionId = currentOption.getOptionId();
-        selectedIds.add(i, currentOptionId);
-        id2option.put(currentOptionId, currentOption);
-      }
+    /**
+     * takes in input a fileConfig and an Option, then it extracts the list of options from the input
+     * config and from this list ,it checks if the input option belong to the selected Set.
+     * Ok 5.0
+     *
+     * @param config
+     * @param option
+     * @return
+     */
+    public boolean optionValidForConfig(FieldConfig config, Option option) {
+        final Options options = optionsManager.getOptions(config);
+        if (options != null && option != null) {
+            Option realOption = options.getOptionById(option.getOptionId());
+            return equalsOption(realOption, option);
+        }
+        return false;
     }
-    map.put("id2option", id2option);
-    map.put("selectedIds", selectedIds);
-    map.put("fieldLayout", fieldLayoutItem);
-    return map;
-  }
-  
-  // --------------------------------------------------------------------------------------  CustomFieldParams methods
 
-  /**
-   * updated 5.04 OK
-   */
-  public Map<String, Option> getValueFromIssue(CustomField field, Issue issue)
-    {
+    /**
+     * checks the input Option verifying that: 1)it's null 2)it's valid for the input FileConfig
+     * 3)it's son of the parent in input
+     * Ok 5.0
+     *
+     * @param customFieldId
+     * @param option
+     * @param parentOption
+     * @param errorCollectionToAddTo
+     * @param config
+     * @return
+     */
+    private boolean checkOption(String customFieldId, Option option, Option parentOption, ErrorCollection errorCollectionToAddTo, FieldConfig config) {
+        if (option == null) {
+            errorCollectionToAddTo.addError(customFieldId, getI18nBean().getText("admin.errors.option.invalid.parent", "'" + parentOption + "'", "'" + config.getName() + "'"));
+            return false;
+        }
+        if (!optionValidForConfig(config, option)) {
+            errorCollectionToAddTo.addError(customFieldId, getI18nBean().getText("admin.errors.option.invalid.for.context", "'" + parentOption + "'", "'" + config.getName() + "'"));
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /*Ok 5.0*/
+    public void validateFromParams(CustomFieldParams relevantParams, ErrorCollection errorCollectionToAddTo, FieldConfig config) {
+        log.debug("Pre- Validate Error collection: [" + errorCollectionToAddTo.getErrors() + "]");
+
+        if (relevantParams == null || relevantParams.isEmpty()) {
+            return;
+        }
+
+        Option parentOption = null;
+        String customFieldId = config.getCustomField().getId();
+        int count = relevantParams.getAllKeys().size();
+        for (int i = 0; i < count; i++) {
+            Option option1 = trasformToOption(config, relevantParams.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
+            if (option1 != null && !option1.toString().contains(":") && !option1.toString().equals(EMPTY_VALUE)) {
+                if (option1 != null) {
+                    log.debug("check option: [" + option1 + "]");
+                    if (!checkOption(customFieldId, option1, parentOption, errorCollectionToAddTo, config)) {
+                        return;
+                    }
+                }
+                parentOption = option1;
+            } else {
+                Collection<String> valueStrings = relevantParams.getAllValues();
+                String[] splittedStrings = null;
+                for (String s : valueStrings) {
+                    splittedStrings = s.split(":");
+                }
+                for (int j = 0; j < splittedStrings.length; j++) {
+                    // this part probably is useless, but for sure is not useful for "none" options
+                    if (!splittedStrings[j].equals(EMPTY_VALUE_ID)) {
+                        Long longOptionValue = new Long(splittedStrings[j]);
+                        Option option = jqlSelectOptionsUtil.getOptionById(longOptionValue);
+                        if (option != null) {
+                            log.debug("check option: [" + option + "]");
+                            if (!checkOption(customFieldId, option, parentOption, errorCollectionToAddTo, config)) {
+                                return;
+                            }
+                        }
+                        parentOption = option;
+                    }
+                }
+
+            }
+        }
+        log.debug("Post-Validate Error collection: [" + errorCollectionToAddTo.getErrors() + "]");
+    }
+
+    /**
+     * add to the default file Config the specific ConfigItem for the multi level cascading select
+     * custom field
+     * Ok 5.0
+     *
+     * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#getConfigurationItemTypes()
+     */
+    @Override
+    public List getConfigurationItemTypes() {
+        final List configurationItemTypes = EasyList.build(JiraUtils.loadComponent(DefaultValueConfigItem.class));
+        configurationItemTypes.add(new SettableMultiLevelOptionsConfigItem4(optionsManager));
+        return configurationItemTypes;
+    }
+
+    public OptionsMap getOptionMapFromOptions(Options options) {
+
+        return new OptionsMap(options);
+    }
+
+    /**
+     * return the velocity parameter for the issue and custom field in input no woking for bugged
+     *
+     * @see com.atlassian.jira.issue.customfields.impl.CascadingSelectCFType#getVelocityParameters(com.atlassian.jira.issue.Issue,
+     *      com.atlassian.jira.issue.fields.CustomField,
+     *      com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem)
+     *      <p/>
+     *      Ok 5.0
+     */
+    @Override
+    public Map<String, Object> getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
+        System.out.println("Are we here?");
+        Map map = super.getVelocityParameters(issue, field, fieldLayoutItem);
+        map.put("mlcscftype", this);
+
+        //mi creo ArrayList con gli id delle option
+
+
+        Map<String, Option> valueFromIssue = this.getValueFromIssue(field, issue);
+        Map<Long, Option> id2option = new HashMap<Long, Option>();
+        ArrayList<Long> selectedIds = new ArrayList<Long>(valueFromIssue.size());
+        for (int i = 0; i < valueFromIssue.size(); i++) {
+            Option currentOption = valueFromIssue.get("" + i);
+            if (currentOption != null) {
+                Long currentOptionId = currentOption.getOptionId();
+                selectedIds.add(i, currentOptionId);
+                id2option.put(currentOptionId, currentOption);
+            }
+        }
+        map.put("id2option", id2option);
+        map.put("selectedIds", selectedIds);
+        map.put("fieldLayout", fieldLayoutItem);
+        return map;
+    }
+
+    // --------------------------------------------------------------------------------------  CustomFieldParams methods
+
+    /**
+     * updated 5.04 OK
+     */
+    public Map<String, Option> getValueFromIssue(CustomField field, Issue issue) {
         Option parentOption = getOptionValueForParentId(field, null, issue);
         Map<String, Option> options = new HashMap<String, Option>();
-        options.put(""+0, parentOption);
-        int i=1;
-        while (parentOption != null)
-        {
+        options.put("" + 0, parentOption);
+        int i = 1;
+        while (parentOption != null) {
             Option childOption = getOptionValueForParentId(field, parentOption.getOptionId().toString(), issue);
-            
-            if (childOption != null)
-            {
-              options.put(""+i, childOption);
-              i++;
-              parentOption=childOption;
-            }
-            else
-              break;
+
+            if (childOption != null) {
+                options.put("" + i, childOption);
+                i++;
+                parentOption = childOption;
+            } else
+                break;
         }
         return options;
     }
-  
-  private Option getOptionValueForParentId(CustomField field,String sParentOptionId, Issue issue)
-  {
-      Collection values;
 
-      values = customFieldValuePersister.getValues(field, issue.getId(), CASCADE_VALUE_TYPE, sParentOptionId);
+    private Option getOptionValueForParentId(CustomField field, String sParentOptionId, Issue issue) {
+        Collection values;
 
-
-      if (values != null && !values.isEmpty())
-      {
-          String optionId = (String) values.iterator().next();
-          return optionsManager.findByOptionId(OptionUtils.safeParseLong(optionId));
-      }
-      else
-      {
-          return null;
-      }
-  }
-  
-
-  public Map<String, Option> getValueFromCustomFieldParams(CustomFieldParams relevantParams) throws FieldValidationException
-  {
-      if (relevantParams != null && !relevantParams.isEmpty())
-      {
-          return getOptionMapFromCustomFieldParams(relevantParams);
-      }
-      else
-      {
-          return null;
-      }
-
-  }
-
-  public Object getStringValueFromCustomFieldParams(CustomFieldParams parameters)
-  {
-      return parameters;
-  }
+        values = customFieldValuePersister.getValues(field, issue.getId(), CASCADE_VALUE_TYPE, sParentOptionId);
 
 
-  //----------------------------------------------------------------------------------------- - Private Helper Methods
-  /*Builds an optionMap for the customFieldParams, 
+        if (values != null && !values.isEmpty()) {
+            String optionId = (String) values.iterator().next();
+            return optionsManager.findByOptionId(OptionUtils.safeParseLong(optionId));
+        } else {
+            return null;
+        }
+    }
+
+
+    public Map<String, Option> getValueFromCustomFieldParams(CustomFieldParams relevantParams) throws FieldValidationException {
+        if (relevantParams != null && !relevantParams.isEmpty()) {
+            return getOptionMapFromCustomFieldParams(relevantParams);
+        } else {
+            return null;
+        }
+
+    }
+
+    public Object getStringValueFromCustomFieldParams(CustomFieldParams parameters) {
+        return parameters;
+    }
+
+
+    //----------------------------------------------------------------------------------------- - Private Helper Methods
+    /*Builds an optionMap for the customFieldParams,
    * Jira 5.04 OK
    * */
-  private Map<String, Option> getOptionMapFromCustomFieldParams(CustomFieldParams params) throws FieldValidationException
-  {
-      Map<String, Option> options = new HashMap<String, Option>();
-      
-      int count = params.getAllKeys().size();
-      for (int i = 0; i < count; i++) {
-        Option option1 = trasformToOption(null, params.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
-        if (option1 != null && !option1.toString().contains(":") && !option1.toString().equals(EMPTY_VALUE)) {
-          if (option1 != null) {
-            log.debug("check option: [" + option1 + "]");
-            options.put(""+i, option1);
-          }}}
-      
+    private Map<String, Option> getOptionMapFromCustomFieldParams(CustomFieldParams params) throws FieldValidationException {
+        Map<String, Option> options = new HashMap<String, Option>();
 
-      return options;
-  }
+        int count = params.getAllKeys().size();
+        for (int i = 0; i < count; i++) {
+            Option option1 = trasformToOption(null, params.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
+            if (option1 != null && !option1.toString().contains(":") && !option1.toString().equals(EMPTY_VALUE)) {
+                if (option1 != null) {
+                    log.debug("check option: [" + option1 + "]");
+                    options.put("" + i, option1);
+                }
+            }
+        }
 
-  /**
-   * forse inutile fare l'override, vediamo
-   * @param key
-   * @param relevantParams
-   * @return
-   * @throws FieldValidationException
-   */
-  private Option extractOptionFromParams(String key, CustomFieldParams relevantParams) throws FieldValidationException
-  {
-      Collection<String> params = relevantParams.getValuesForKey(key);
-      if (params != null && !params.isEmpty())
-      {
-          String selectValue = params.iterator().next();
-          if (ObjectUtils.isValueSelected(selectValue) && selectValue != null)
-          {
-              return (Option) this.getSingularObjectFromString((String) selectValue);
-          }
-      }
 
-      return null;
-  }
-
-  
-  
-  /**
-   * trasforms the object(Option) in input in an Option.
-   * Ok 5.0
-   * @param value
-   * @param object
-   * @return
-   */
-  private Option trasformToOption(FieldConfig config, Object value) {
-    if (value instanceof Option) {
-      return (Option) value;
+        return options;
     }
-    if (value instanceof String && EMPTY_VALUE_ID.equals(value)) {
-      return this.optionsManager.createOption(config, EMPTY_VALUE_ID_LONG, EMPTY_VALUE_ID_LONG, EMPTY_VALUE);
-    } else if (value instanceof String && !"-1".equals(value)) {
-      return (Option) this.getSingularObjectFromString((String) value);
+
+    /**
+     * forse inutile fare l'override, vediamo
+     *
+     * @param key
+     * @param relevantParams
+     * @return
+     * @throws FieldValidationException
+     */
+    private Option extractOptionFromParams(String key, CustomFieldParams relevantParams) throws FieldValidationException {
+        Collection<String> params = relevantParams.getValuesForKey(key);
+        if (params != null && !params.isEmpty()) {
+            String selectValue = params.iterator().next();
+            if (ObjectUtils.isValueSelected(selectValue) && selectValue != null) {
+                return (Option) this.getSingularObjectFromString((String) selectValue);
+            }
+        }
+
+        return null;
     }
-    return null;
-  }
-  public String getChangelogValue(CustomField field, Map<String, Option> cascadingOptions)
-  {
-      if (cascadingOptions != null)
-      {
-          StringBuilder sb = new StringBuilder();
-          Option currentOpt;
-          Set<String> levels = cascadingOptions.keySet();
-          for(int i=0;i<levels.size();i++){
-            currentOpt=cascadingOptions.get(""+i);
-            if(currentOpt!=null){
-            sb.append("Level: "+i);
-            sb.append(" -> "+currentOpt.getValue()+" ");}
-          }
-          return sb.toString();
-      }
-      else
-      {
-          return "";
-      }
-  }
+
+
+    /**
+     * trasforms the object(Option) in input in an Option.
+     * Ok 5.0
+     *
+     * @param value
+     * @param object
+     * @return
+     */
+    private Option trasformToOption(FieldConfig config, Object value) {
+        if (value instanceof Option) {
+            return (Option) value;
+        }
+        if (value instanceof String && EMPTY_VALUE_ID.equals(value)) {
+            return this.optionsManager.createOption(config, EMPTY_VALUE_ID_LONG, EMPTY_VALUE_ID_LONG, EMPTY_VALUE);
+        } else if (value instanceof String && !"-1".equals(value)) {
+            return (Option) this.getSingularObjectFromString((String) value);
+        }
+        return null;
+    }
+
+    public String getChangelogValue(CustomField field, Map<String, Option> cascadingOptions) {
+        if (cascadingOptions != null) {
+            StringBuilder sb = new StringBuilder();
+            Option currentOpt;
+            Set<String> levels = cascadingOptions.keySet();
+            for (int i = 0; i < levels.size(); i++) {
+                currentOpt = cascadingOptions.get("" + i);
+                if (currentOpt != null) {
+                    sb.append("Level: " + i);
+                    sb.append(" -> " + currentOpt.getValue() + " ");
+                }
+            }
+            return sb.toString();
+        } else {
+            return "";
+        }
+    }
 //-------------------------------------------------------------------------------------------------------- Defaults
 
-  @Override
-  public Map<String, Option> getDefaultValue(FieldConfig fieldConfig)
-  {
-      final Object o = genericConfigManager.retrieve(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString());
-      if (o != null)
-      {
-          final CustomFieldParams params = new CustomFieldParamsImpl(fieldConfig.getCustomField(), o);
-          return getOptionMapFromCustomFieldParams(params);
-      }
-      else
-      {
-          return null;
-      }
-  }
+    @Override
+    public Map<String, Option> getDefaultValue(FieldConfig fieldConfig) {
+        final Object o = genericConfigManager.retrieve(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString());
+        if (o != null) {
+            final CustomFieldParams params = new CustomFieldParamsImpl(fieldConfig.getCustomField(), o);
+            //return getOptionMapFromCustomFieldParams(params);
+            Map<String, Option> options = new HashMap<String, Option>();
 
-  @Override
-  public void setDefaultValue(FieldConfig fieldConfig, Map<String, Option> cascadingOptions)
-  {
-      if (cascadingOptions != null)
-      {
-          final CustomFieldParams customFieldParams = new CustomFieldParamsImpl(fieldConfig.getCustomField(), cascadingOptions);
-          customFieldParams.transformObjectsToStrings();
-          customFieldParams.setCustomField(null);
+            int count = params.getAllKeys().size();
+            for (int i = 0; i < count; i++) {
+                Option option = trasformToOption(null, params.getFirstValueForKey(String.valueOf(i)));
+                if (option != null) {
+                    options.put("" + i, option);
+                }
+            }
 
-          genericConfigManager.update(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString(), customFieldParams);
-      }
-      else
-      {
-          genericConfigManager.update(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString(), null);
-      }
-  }
+            return options;
+        } else {
+            return null;
+        }
+    }
 
-  
-  
+    @Override
+    public void setDefaultValue(FieldConfig fieldConfig, Map<String, Option> cascadingOptions) {
+        if (cascadingOptions != null) {
+            final CustomFieldParams customFieldParams = new CustomFieldParamsImpl(fieldConfig.getCustomField(), cascadingOptions);
+            customFieldParams.transformObjectsToStrings();
+            customFieldParams.setCustomField(null);
+
+            genericConfigManager.update(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString(), customFieldParams);
+        } else {
+            genericConfigManager.update(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString(), null);
+        }
+    }
+
+
 //---------------------------------- Json representation
-  
-  
-  /**
-   * I'dont' know where is used
-   * */
-  @Override
-  public FieldJsonRepresentation getJsonFromIssue(CustomField field, Issue issue, boolean renderedVersionRequested, FieldLayoutItem fieldLayoutItem)
-  {
-      Map<String, Option> options = getValueFromIssue(field, issue);
-      Option parent ;
-      Option child ;
-      if (options == null)
-      {
-          return new FieldJsonRepresentation(new JsonData(null));
-      }
-      FieldJsonRepresentation fieldJsonRepresentation = new FieldJsonRepresentation(null);
-      for(int i=1;i<options.size();i++){
-        parent=options.get(""+(i-1));
-        child=options.get(""+i);
-        JsonData jsonData = new JsonData(CustomFieldOptionJsonBean.shortBean(parent, child, jiraBaseUrls));
-        fieldJsonRepresentation.setRenderedData(jsonData);
-      }
-      return fieldJsonRepresentation;
-  }
 
-  @Override
-  public RestFieldOperationsHandler getRestFieldOperation(CustomField field)
-  {
-      return new MultiLevelCascadingSelectCustomFieldOperationsHandler(optionsManager, field, getI18nBean());
-  }
 
-  /*
+    /**
+     * I'dont' know where is used
+     */
+    @Override
+    public FieldJsonRepresentation getJsonFromIssue(CustomField field, Issue issue, boolean renderedVersionRequested, FieldLayoutItem fieldLayoutItem) {
+        Map<String, Option> options = getValueFromIssue(field, issue);
+        Option parent;
+        Option child;
+        if (options == null) {
+            return new FieldJsonRepresentation(new JsonData(null));
+        }
+        FieldJsonRepresentation fieldJsonRepresentation = new FieldJsonRepresentation(null);
+        for (int i = 1; i < options.size(); i++) {
+            parent = options.get("" + (i - 1));
+            child = options.get("" + i);
+            JsonData jsonData = new JsonData(CustomFieldOptionJsonBean.shortBean(parent, child, jiraBaseUrls));
+            fieldJsonRepresentation.setRenderedData(jsonData);
+        }
+        return fieldJsonRepresentation;
+    }
+
+    @Override
+    public RestFieldOperationsHandler getRestFieldOperation(CustomField field) {
+        return new MultiLevelCascadingSelectCustomFieldOperationsHandler(optionsManager, field, getI18nBean());
+    }
+
+    /*
    * Non corretto, cercare come poterlo fare
    * */
-  @Override
-  public JsonData getJsonDefaultValue(IssueContext issueCtx, CustomField field)
-  {
-      FieldConfig fieldConfig = field.getRelevantConfig(issueCtx);
-      final Object o = genericConfigManager.retrieve(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString());
-      if (o != null)
-      {
-          final CustomFieldParams params = new CustomFieldParamsImpl(fieldConfig.getCustomField(), o);
-          Map<String, Option> options = getOptionMapFromCustomFieldParams(params);
-          if (options == null)
-          {
-              return new JsonData(null);
-          }
-          Option parent = options.get(PARENT_KEY);
-          Option child = options.get(CHILD_KEY);
-          JsonData jsonData = new JsonData(CustomFieldOptionJsonBean.shortBean(parent, child, jiraBaseUrls));
-          System.out.println(jsonData.asString());
-          return jsonData;
-      }
-      else
-      {
-          return null;
-      }}
+    @Override
+    public JsonData getJsonDefaultValue(IssueContext issueCtx, CustomField field) {
+        FieldConfig fieldConfig = field.getRelevantConfig(issueCtx);
+        final Object o = genericConfigManager.retrieve(DEFAULT_VALUE_TYPE, fieldConfig.getId().toString());
+        if (o != null) {
+            final CustomFieldParams params = new CustomFieldParamsImpl(fieldConfig.getCustomField(), o);
+            Map<String, Option> options = getOptionMapFromCustomFieldParams(params);
+            if (options == null) {
+                return new JsonData(null);
+            }
+            Option parent = options.get(PARENT_KEY);
+            Option child = options.get(CHILD_KEY);
+            JsonData jsonData = new JsonData(CustomFieldOptionJsonBean.shortBean(parent, child, jiraBaseUrls));
+            System.out.println(jsonData.asString());
+            return jsonData;
+        } else {
+            return null;
+        }
+    }
 
-  private final Logger log = Logger.getLogger(MultiLevelCascadingSelectCFType.class);
+    private final Logger log = Logger.getLogger(MultiLevelCascadingSelectCFType.class);
 }

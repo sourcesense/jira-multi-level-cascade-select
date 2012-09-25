@@ -4,14 +4,14 @@
         <version>${project.version}</version>
         <vendor name="${project.organization.name}" url="${project.organization.url}" />
     </plugin-info>
-    
-<jql-function key="multilevelcascadeOption" name="multilevelcascadeOption" class="com.sourcesense.jira.customfield.searcher.MultiLevelCascadeOptionFunction">
-  <!--The name of the function-->
-  <fname>multilevelcascadeOption</fname>
-  <!--Whether this function returns a list or a single value-->
-  <list>true</list>
-</jql-function>
 
+    <jql-function key="multilevelcascadeOption" name="multilevelcascadeOption"
+                  class="com.sourcesense.jira.customfield.searcher.MultiLevelCascadeOptionFunction">
+        <!--The name of the function-->
+        <fname>multilevelcascadeOption</fname>
+        <!--Whether this function returns a list or a single value-->
+        <list>true</list>
+    </jql-function>
 
     <customfield-type key="multi-level-cascading-select" name="Multi level Cascading Select"
                       class="com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType">
@@ -25,7 +25,8 @@
                   location="templates/plugins/customfield/multi-level-cascading-select-xml.vm"/>
     </customfield-type>
 
-<customfield-searcher key="multi-level-cascading-select-searcher" name="Multi level Cascading Select Searcher"
+    <customfield-searcher key="multi-level-cascading-select-searcher"
+                          name="Multi level Cascading Select Searcher"
                           class="com.sourcesense.jira.customfield.searcher.MultiLevelCascadingSelectSearcher4">
         <resource type="velocity" name="view"
                   location="templates/plugins/customfield/searcher/multi-level-cascading-select-view.vm"/>

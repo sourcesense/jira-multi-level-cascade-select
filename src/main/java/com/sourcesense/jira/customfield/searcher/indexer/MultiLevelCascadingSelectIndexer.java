@@ -105,13 +105,10 @@ public class MultiLevelCascadingSelectIndexer extends AbstractCustomFieldIndexer
   }
 
   
-  /**
+  /*
    * indexes all the info contained in all child-level of the custom field.
    * Remember that the Multi level cascading select allows you to create n levels of children from the parent node.
    * Updated to Jira 5.04 To Check
-   * @param customFieldParams
-   * @param doc
-   * @param indexType
    */
   private void indexAllLevels(Map<String, Option> cascadingOptions, final Document doc, final Field.Index indexType) {
     Option currentOption;
@@ -129,11 +126,8 @@ public class MultiLevelCascadingSelectIndexer extends AbstractCustomFieldIndexer
     }
   }
   
-  /**
+  /*
    * indexes the Parent Option value in the Lucene Doc.
-   * @param customFieldParams
-   * @param doc
-   * @param indexType
    */
   private void indexParentField(Map<String, Option> cascadingOptions, final Document doc, final Field.Index indexType) {
     if ((cascadingOptions != null) && !cascadingOptions.isEmpty()) {
