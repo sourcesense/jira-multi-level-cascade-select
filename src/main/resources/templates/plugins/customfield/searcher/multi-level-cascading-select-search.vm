@@ -73,5 +73,7 @@ $!{auiparams.clear()}
                 MLCS.selectOption('select#search-${customField.id}\\:$!selectedId', '${selectedValue}');
             #end
         #end
+    #else
+        MLCS.selectOption('select#search-${customField.id}', '-1');
     #end
 </script>

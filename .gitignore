@@ -1,0 +1,14 @@
+# IntelliJ IDEA files
+*.iws
+*.iml
+*.ipr
+.idea/
+target/
+out/
+
+# Eclipse files
+*.project
+*.settings
+
+# OSX dodgy files
+.DS_Store

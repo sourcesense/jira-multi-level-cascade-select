@@ -14,12 +14,11 @@
 
     <groupId>com.sourcesense.jira.plugin</groupId>
     <artifactId>cascadingselect</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.6.1-SNAPSHOT</version>
 
     <name>Multilevel Cascade Select</name>
     <description>Multilevel Cascade Select custom field, searcher and portlet</description>
-    <!--<packaging>jar</packaging>-->
-    <packaging>atlassian-plugin</packaging>
+    <packaging>jar</packaging>
 
     <distributionManagement>
         <site>
@@ -54,6 +53,7 @@
                    <skip>true</skip>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-jira-plugin</artifactId>
@@ -64,6 +64,7 @@
                     <productDataVersion>${jira.version}</productDataVersion>
                 </configuration>
             </plugin>
+            -->
             <plugin>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>2.3</version>
