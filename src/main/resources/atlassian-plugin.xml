@@ -13,9 +13,9 @@
         <list>true</list>
     </jql-function>
 
-    <customfield-type key="multi-level-cascading-select" name="Multi level Cascading Select"
+    <customfield-type key="multi-level-cascading-select" name="Multi-Level Cascading Select"
                       class="com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType">
-        <description>Select list with more than two levels.</description>
+        <description>Cascading select list supporting more than two levels.</description>
 
         <resource type="velocity" name="view"
                   location="templates/plugins/customfield/multi-level-cascading-select-view.vm"/>
@@ -26,7 +26,7 @@
     </customfield-type>
 
     <customfield-searcher key="multi-level-cascading-select-searcher"
-                          name="Multi level Cascading Select Searcher"
+                          name="Multi-Level Cascading Select Searcher"
                           class="com.sourcesense.jira.customfield.searcher.MultiLevelCascadingSelectSearcher4">
         <resource type="velocity" name="view"
                   location="templates/plugins/customfield/searcher/multi-level-cascading-select-view.vm"/>
@@ -38,7 +38,7 @@
         <valid-customfield-type package="${project.groupId}.${project.artifactId}" key="multi-level-cascading-select"/>
     </customfield-searcher>
 
-    <webwork1 key="action-multi-level-cascading-select" name="Multi level cascading select configuration">
+    <webwork1 key="action-multi-level-cascading-select" name="Multi-Level Cascading Select Configuration">
         <description>Multi level cascading select configuration.</description>
         <actions>
             <action name="com.sourcesense.jira.customfield.admin_config.EditCustomFieldMultiLevelOptions" alias="EditCustomFieldMultiLevelOptions"

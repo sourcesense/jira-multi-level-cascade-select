@@ -127,53 +127,57 @@ public class MultiLevelCascadeOptionFunction extends AbstractJqlFunction impleme
    * {@link com.atlassian.jira.jql.operand.QueryLiteral}s returned will have Long values, but they
    * may be either positive or negative. Positive values indicate that the option ids should be
    * included in the results, whereas negative ids mean that they should be excluded.
-   * 
-   * @param queryCreationContext
-   *          the context of query creation
-   * @param operand
-   *          the operand to get values from
-   * @param terminalClause
-   *          the terminal clause that contains the operand
+   *
+   * @param queryCreationContext the context of query creation
+   * @param operand              the operand to get values from
+   * @param terminalClause       the terminal clause that contains the operand
    * @return a list of query literals following the scheme described above; never null.
    */
   public List<QueryLiteral> getValues(final QueryCreationContext queryCreationContext, final FunctionOperand operand, final TerminalClause terminalClause) {
-    notNull("queryCreationContext", queryCreationContext);
-    LinkedList<Option> orderedOptions = new LinkedList<Option>();
-    List<QueryLiteral> result = new ArrayList<QueryLiteral>();
-    final List<String> args = operand.getArgs();
-    com.atlassian.crowd.embedded.api.User user = queryCreationContext.getUser();
-    final Set<CustomField> fields = resolveField(queryCreationContext.isSecurityOverriden(), user, terminalClause.getName());
-    if (!args.isEmpty() && !fields.isEmpty()) {
-      String parent = args.get(0);
-      if (isEmptyArg(parent)) {
-        // only return the right result if it validates correctly i.e. if the "none" is on its own
-        return args.size() == 1 ? Collections.singletonList(new QueryLiteral(operand)) : Collections.<QueryLiteral> emptyList();
-      }
-      parent = cleanArg(parent);
-      Collection<Option> parentOptions = getParentOptions(operand, fields, parent);
-      for (Option parentOpt : parentOptions)
-        orderedOptions.addLast(parentOpt);
-      for (int j = 1; j < args.size(); j++) {
-        String childArg = args.get(j);
-        if (isEmptyArg(childArg)) {
-          LinkedList<Option> childOptions = new LinkedList<Option>();
-          for (Option parentOption : parentOptions) {
-            for (Option child : parentOption.getChildOptions())
-              childOptions.addLast(child);
-          }
-          parentOptions = childOptions;
-        } else {
-          childArg = cleanArg(childArg);
-          Set<Option> childOptions = getOptions(operand, fields, childArg,parentOptions);
-          for (Option child : childOptions)
-            orderedOptions.addLast(child);
-        }
-      }
-      /*the result is built with ordered options from the parent to the last child, to allow a good query construction*/
-      result = createLiterals(operand, orderedOptions, Collections.<Option> emptySet());
+      notNull("queryCreationContext", queryCreationContext);
+      LinkedList<Option> orderedOptions = new LinkedList<Option>();
+      List<QueryLiteral> result = new ArrayList<QueryLiteral>();
+      final List<String> args = operand.getArgs();
+      User user = queryCreationContext.getUser();
+      final Set<CustomField> fields = resolveField(queryCreationContext.isSecurityOverriden(), user, terminalClause.getName());
 
-    }
-    return result;
+      if (!args.isEmpty() && !fields.isEmpty()) {
+          String parent = args.get(0);
+          if (isEmptyArg(parent)) {
+              // only return the right result if it validates correctly i.e. if the "none" is on its own
+              return args.size() == 1 ? Collections.singletonList(new QueryLiteral(operand)) : Collections.<QueryLiteral>emptyList();
+          }
+
+          parent = cleanArg(parent);
+          Collection<Option> parentOptions = getParentOptions(operand, fields, parent);
+
+          for (Option parentOpt : parentOptions)
+              orderedOptions.addLast(parentOpt);
+
+          for (int j = 1; j < args.size(); j++) {
+              String childArg = args.get(j);
+
+              if (isEmptyArg(childArg)) {
+                  LinkedList<Option> childOptions = new LinkedList<Option>();
+
+                  for (Option parentOption : parentOptions) {
+                      for (Option child : parentOption.getChildOptions())
+                          childOptions.addLast(child);
+                  }
+                  parentOptions = childOptions;
+              } else {
+                  childArg = cleanArg(childArg);
+                  Set<Option> childOptions = getOptions(operand, fields, childArg, parentOptions);
+                  for (Option child : childOptions)
+                      orderedOptions.addLast(child);
+              }
+          }
+
+          /*the result is built with ordered options from the parent to the last child, to allow a good query construction*/
+          result = createLiterals(operand, orderedOptions, Collections.<Option>emptySet());
+
+      }
+      return result;
   }
 
   public int getMinimumNumberOfExpectedArguments() {

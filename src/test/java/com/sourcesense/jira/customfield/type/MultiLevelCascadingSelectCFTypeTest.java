@@ -7,28 +7,27 @@ import com.atlassian.jira.issue.customfields.manager.OptionsManager;
 import com.atlassian.jira.issue.customfields.option.Option;
 import com.atlassian.jira.issue.customfields.persistence.CustomFieldValuePersister;
 import com.atlassian.jira.issue.customfields.persistence.PersistenceFieldType;
+import com.atlassian.jira.issue.customfields.view.CustomFieldParams;
 import com.atlassian.jira.issue.customfields.view.CustomFieldParamsImpl;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
+import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.jql.util.JqlSelectOptionsUtil;
+import com.atlassian.jira.util.ErrorCollection;
+import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Alex Cowell
@@ -37,10 +36,12 @@ public class MultiLevelCascadingSelectCFTypeTest {
 
     private static final PersistenceFieldType CASCADE_VALUE_TYPE = MultiLevelCascadingSelectCFType.CASCADE_VALUE_TYPE;
     private static final Long ISSUE_ID = 1L;
+    private static final Long CF_ID = 123L;
 
     private MultiLevelCascadingSelectCFType cfType;
     private CustomFieldValuePersister customFieldValuePersister;
     private GenericConfigManager genericConfigManager;
+    private OptionsManager optionsManager;
     private CustomField customField;
     private Issue issue;
 
@@ -50,7 +51,7 @@ public class MultiLevelCascadingSelectCFTypeTest {
         issue = mock(Issue.class);
         when(issue.getId()).thenReturn(ISSUE_ID);
 
-        OptionsManager optionsManager = mock(OptionsManager.class);
+        optionsManager = mock(OptionsManager.class);
         customFieldValuePersister = mock(CustomFieldValuePersister.class);
         genericConfigManager = mock(GenericConfigManager.class);
         JqlSelectOptionsUtil jqlSelectOptionsUtil = mock(JqlSelectOptionsUtil.class);
@@ -285,10 +286,10 @@ public class MultiLevelCascadingSelectCFTypeTest {
         cascadingOptions.put("0", option);
 
         FieldConfig fieldConfig = mock(FieldConfig.class);
-        when(fieldConfig.getId()).thenReturn(123L);
+        when(fieldConfig.getId()).thenReturn(CF_ID);
         when(fieldConfig.getCustomField()).thenReturn(customField);
 
-        when(genericConfigManager.retrieve(CustomFieldType.DEFAULT_VALUE_TYPE, String.valueOf(123L)))
+        when(genericConfigManager.retrieve(CustomFieldType.DEFAULT_VALUE_TYPE, CF_ID.toString()))
                 .thenReturn(new CustomFieldParamsImpl(customField, cascadingOptions));
 
         Map<String, Option> defaultValue = cfType.getDefaultValue(fieldConfig);
@@ -306,10 +307,10 @@ public class MultiLevelCascadingSelectCFTypeTest {
         cascadingOptions.put("1", childOption);
 
         FieldConfig fieldConfig = mock(FieldConfig.class);
-        when(fieldConfig.getId()).thenReturn(123L);
+        when(fieldConfig.getId()).thenReturn(CF_ID);
         when(fieldConfig.getCustomField()).thenReturn(customField);
 
-        when(genericConfigManager.retrieve(CustomFieldType.DEFAULT_VALUE_TYPE, String.valueOf(123L)))
+        when(genericConfigManager.retrieve(CustomFieldType.DEFAULT_VALUE_TYPE, CF_ID.toString()))
                 .thenReturn(new CustomFieldParamsImpl(customField, cascadingOptions));
 
         Map<String, Option> defaultValue = cfType.getDefaultValue(fieldConfig);
@@ -318,7 +319,158 @@ public class MultiLevelCascadingSelectCFTypeTest {
         assertEquals(childOption.getOptionId(), defaultValue.get("1").getOptionId());
     }
 
-    private Option mockOption(Long optionId, Option parent) {
+    @Test
+    public void setDefaultValueToNone() throws Exception {
+        FieldConfig fieldConfig = mock(FieldConfig.class);
+        when(fieldConfig.getId()).thenReturn(CF_ID);
+
+        Map<String, Option> newDefaultValue = null;
+        cfType.setDefaultValue(fieldConfig, newDefaultValue);
+
+        verify(genericConfigManager)
+                .update(CustomFieldType.DEFAULT_VALUE_TYPE, CF_ID.toString(), null);
+    }
+
+    @Test
+    public void setDefaultValueToSingleLevelField() throws Exception {
+        Map<String, Option> cascadingOptions = new HashMap<String, Option>();
+        cascadingOptions.put("0", mockOption(10000L, null));
+
+        FieldConfig fieldConfig = mock(FieldConfig.class);
+        when(fieldConfig.getId()).thenReturn(CF_ID);
+        when(fieldConfig.getCustomField()).thenReturn(customField);
+        when(customField.getCustomFieldType()).thenReturn(cfType);
+
+        Map<String, Object> expectedOptions = new HashMap<String, Object>();
+        expectedOptions.put("0", "10000");
+        CustomFieldParams expectedParams = new CustomFieldParamsImpl(null, expectedOptions);
+
+        cfType.setDefaultValue(fieldConfig, cascadingOptions);
+
+        verify(genericConfigManager)
+                .update(CustomFieldType.DEFAULT_VALUE_TYPE, CF_ID.toString(), expectedParams);
+    }
+
+    @Test
+    public void setDefaultValueToMultipleLevelField() throws Exception {
+        Option parentOption = mockOption(10000L, null);
+        Option childOption = mockOption(10001L, parentOption);
+
+        Map<String, Option> cascadingOptions = new HashMap<String, Option>();
+        cascadingOptions.put("0", parentOption);
+        cascadingOptions.put("1", childOption);
+
+        FieldConfig fieldConfig = mock(FieldConfig.class);
+        when(fieldConfig.getId()).thenReturn(CF_ID);
+        when(fieldConfig.getCustomField()).thenReturn(customField);
+        when(customField.getCustomFieldType()).thenReturn(cfType);
+
+        Map<String, Object> expectedOptions = new HashMap<String, Object>();
+        expectedOptions.put("0", "10000");
+        expectedOptions.put("1", "10001");
+        CustomFieldParams expectedParams = new CustomFieldParamsImpl(null, expectedOptions);
+
+        cfType.setDefaultValue(fieldConfig, cascadingOptions);
+
+        verify(genericConfigManager)
+                .update(CustomFieldType.DEFAULT_VALUE_TYPE, CF_ID.toString(), expectedParams);
+    }
+
+    @Test
+    public void getVelocityParametersWithNullIssueShouldNotTryToGetValues() throws Exception {
+        FieldLayoutItem fieldLayoutItem = mock(FieldLayoutItem.class);
+        Map<String, Object> velocityParameters = cfType.getVelocityParameters(null, customField, fieldLayoutItem);
+
+        assertNotNull(velocityParameters);
+        assertEquals(2, velocityParameters.size());
+        assertTrue(velocityParameters.containsKey("request"));
+        assertEquals(cfType, velocityParameters.get("mlcscftype"));
+    }
+
+    @Test
+    public void getVelocityParametersWithNonNullIssueShouldPopulateParametersWithValues() throws Exception {
+        FieldLayoutItem fieldLayoutItem = mock(FieldLayoutItem.class);
+        Map<String, Object> velocityParameters = cfType.getVelocityParameters(issue, customField, fieldLayoutItem);
+
+        assertNotNull(velocityParameters);
+        assertEquals(2, velocityParameters.size());
+        assertTrue(velocityParameters.containsKey("request"));
+        assertEquals(cfType, velocityParameters.get("mlcscftype"));
+    }
+
+    @Test
+    public void getValueFromIssueWithNoValueShouldReturnNull() throws Exception {
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, null))
+                .thenReturn(Lists.newArrayList());
+
+        Map<String, Option> value = cfType.getValueFromIssue(customField, issue);
+        assertNull(value);
+    }
+
+    @Test
+    public void getValueFromIssueWithJustParentShouldReturnMapWithParentOption() throws Exception {
+        Option parentOption = mockOption(10000L, null);
+
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, null))
+                .thenReturn(Lists.<Object>newArrayList("10000"));
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, "10000"))
+                .thenReturn(Lists.newArrayList());
+        when(optionsManager.findByOptionId(parentOption.getOptionId())).thenReturn(parentOption);
+
+        Map<String, Option> value = cfType.getValueFromIssue(customField, issue);
+        assertNotNull(value);
+        assertEquals(1, value.size());
+        assertEquals(parentOption.getOptionId(), value.get("0").getOptionId());
+    }
+
+    @Test
+    public void getValueFromIssueWithParentAndChildShouldReturnMapWithTwoOptions() throws Exception {
+        Option parentOption = mockOption(10000L, null);
+        Option childOption = mockOption(10001L, parentOption);
+
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, null))
+                .thenReturn(Lists.<Object>newArrayList("10000"));
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, "10000"))
+                .thenReturn(Lists.<Object>newArrayList("10001"));
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, "10001"))
+                .thenReturn(Lists.newArrayList());
+        when(optionsManager.findByOptionId(parentOption.getOptionId())).thenReturn(parentOption);
+        when(optionsManager.findByOptionId(childOption.getOptionId())).thenReturn(childOption);
+
+        Map<String, Option> value = cfType.getValueFromIssue(customField, issue);
+        assertNotNull(value);
+        assertEquals(2, value.size());
+        assertEquals(parentOption.getOptionId(), value.get("0").getOptionId());
+        assertEquals(childOption.getOptionId(), value.get("1").getOptionId());
+    }
+
+    @Test
+    public void getValueFromIssueWithThreeOptionsShouldReturnMapWithThreeOptions() throws Exception {
+        Option parentOption = mockOption(10000L, null);
+        Option childOption1 = mockOption(10001L, parentOption);
+        Option childOption2 = mockOption(10002L, childOption1);
+
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, null))
+                .thenReturn(Lists.<Object>newArrayList("10000"));
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, "10000"))
+                .thenReturn(Lists.<Object>newArrayList("10001"));
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, "10001"))
+                .thenReturn(Lists.<Object>newArrayList("10002"));
+        when(customFieldValuePersister.getValues(customField, ISSUE_ID, CASCADE_VALUE_TYPE, "10002"))
+                .thenReturn(Lists.newArrayList());
+        when(optionsManager.findByOptionId(parentOption.getOptionId())).thenReturn(parentOption);
+        when(optionsManager.findByOptionId(childOption1.getOptionId())).thenReturn(childOption1);
+        when(optionsManager.findByOptionId(childOption2.getOptionId())).thenReturn(childOption2);
+
+        Map<String, Option> value = cfType.getValueFromIssue(customField, issue);
+        assertNotNull(value);
+        assertEquals(3, value.size());
+        assertEquals(parentOption.getOptionId(), value.get("0").getOptionId());
+        assertEquals(childOption1.getOptionId(), value.get("1").getOptionId());
+        assertEquals(childOption2.getOptionId(), value.get("2").getOptionId());
+    }
+
+    private Option mockOption(Long optionId, @Nullable Option parent) {
         Option option = mock(Option.class);
         when(option.getOptionId()).thenReturn(optionId);
         when(option.getParentOption()).thenReturn(parent);

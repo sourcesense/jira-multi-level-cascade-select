@@ -1,23 +1,20 @@
 #if (!$request || !$request.getAttribute("multilevelcascade"))
 $!request.setAttribute("multilevelcascade" , "true")
-    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/cascadingUtil.js"></script>
     <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/multilevelcascadingUtil.js"></script>
 #end
 $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
 #searcherEditHeader ($customField.id $customField.name)
 
 
-
 #macro(renderSelect $key $customfieldid $levels)
     #if ($levels.get($key))
         #set ($parentMap = $levels.get($key))
-        <select name="$customfieldid:$key" id="$customfieldid:$key">
+        <select class="select" name="${customfieldid}:$key" id="search-${customfieldid}:$key">
         #if (!$fieldLayoutItem.required)
             #foreach ($parentid in $parentMap.keySet())
                 <option class="$parentid" value="-1">$i18n.getText("common.words.pleaseselect")</option>
             #end
             <option class="select" value="-1">$i18n.getText("common.filters.any")</option>
-            <option class="select" value="-2">$i18n.getText("none")</option>
         #end
         #foreach ($parentid in $parentMap.keySet())
             #if ($parentMap.get($parentid))
@@ -30,27 +27,27 @@ $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
     #end
 #end
 
-#set ($customList = $mlcscftype.getOptionMapFromOptions($configs.options))
+#set($customList = $mlcscftype.getOptionMapFromOptions($configs.options))
+#set($numLevels = $customList.size() - 1)
 
 #if ($customList.get(null))
-    <select name="${customField.id}" id="${customField.id}">
+    <select class="select" name="${customField.id}" id="search-${customField.id}">
         #if (!$fieldLayoutItem.required)
             <option value="-1">$i18n.getText("common.words.pleaseselect")</option>
-            <option value="-1">$i18n.getText("common.filters.any")</option>
-      
         #end
+            <option value="-1">$i18n.getText("common.filters.any")</option>
         #set ($rootMap = $customList.get(null))
         #foreach ($option in $rootMap.get(null))
             <option value="$option.optionId">$option.value</option>
         #end
     </select>
 
-    #foreach($id in [1..10])
+    #foreach($id in [1..$numLevels])
         #set($key = $id.toString())
         #if ($customList.get($key))
             #renderSelect ($key ${customField.id} $customList)
             #if ($id > 1)
-                #set ($script = "$!script dynamicMultiLevelSelect('${customField.id}\\:$prevkey', '${customField.id}\\:$key');")
+                #set ($script = "$!script MLCS.dynamicSelect('search-${customField.id}\\:$prevkey', 'search-${customField.id}\\:$key');")
             #end
         #end
         #set ($prevkey = $key)
@@ -60,19 +57,21 @@ $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
 #searcherEditFooter ($customField.id $customField.description)
 $!{auiparams.clear()}
 <script>
-    dynamicMultiLevelSelect('${customField.id}', '${customField.id}\\:1');
+    MLCS.dynamicSelect('search-${customField.id}', 'search-${customField.id}\\:1');
     $!script
-#if ($value.getValuesForKey(null) && !$value.getValuesForKey(null).empty)
-    #set ($selectedParent = $value.getValuesForKey(null).iterator().next())
-    selectOption("select#${customField.id}", $selectedParent);
-    #foreach($id in [1..10])
-        #set($key = $id.toString())
-        #if ($value.getValuesForKey($key) && !$value.getValuesForKey($key).empty)
-            #set ($selectedChild = $value.getValuesForKey($key).iterator().next())
-            selectOption("select#${customField.id}\\:$!key", $selectedChild);
+
+    #if ($value.getFirstValueForKey(null))
+        MLCS.selectOption('select#search-${customField.id}', '${value.getFirstValueForKey(null)}');
+
+        #if ($numLevels >= 1)
+            #foreach ($selectedId in [1..$numLevels])
+                #if ($value.getFirstValueForKey($selectedId.toString()))
+                    #set($selectedValue = $value.getFirstValueForKey($selectedId.toString()))
+                #else
+                    #set($selectedValue = "-1")
+                #end
+                MLCS.selectOption('select#search-${customField.id}\\:$!selectedId', '${selectedValue}');
+            #end
         #end
     #end
-#else
-    clickFirstVisible("select#${customField.id}");
-#end
 </script>

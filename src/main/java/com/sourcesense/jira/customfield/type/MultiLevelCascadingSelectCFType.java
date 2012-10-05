@@ -2,7 +2,6 @@ package com.sourcesense.jira.customfield.type;
 
 import static com.atlassian.jira.util.dbc.Assertions.notNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.atlassian.jira.util.ObjectUtils;
-import com.atlassian.jira.ManagerFactory;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.context.IssueContext;
 import com.atlassian.jira.issue.customfields.config.item.DefaultValueConfigItem;
@@ -35,13 +33,14 @@ import com.atlassian.jira.issue.fields.rest.json.JsonData;
 import com.atlassian.jira.issue.fields.rest.json.beans.CustomFieldOptionJsonBean;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
 import com.atlassian.jira.jql.util.JqlSelectOptionsUtil;
-import com.atlassian.jira.util.EasyList;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraUtils;
 import com.google.common.collect.Lists;
 import com.sourcesense.jira.common.OptionsMap;
 import com.sourcesense.jira.customfield.MultiLevelCascadingSelectCustomFieldOperationsHandler;
 import com.sourcesense.jira.customfield.admin_config.SettableMultiLevelOptionsConfigItem4;
+
+import javax.annotation.Nullable;
 
 /**
  * This class represents the MultiLevelCascading Select Custom Field Type.
@@ -132,7 +131,6 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
         }
     }
 
-
     /*
      * Ok 5.0
      */
@@ -206,7 +204,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
         String customFieldId = config.getCustomField().getId();
         int count = relevantParams.getAllKeys().size();
         for (int i = 0; i < count; i++) {
-            Option option1 = trasformToOption(config, relevantParams.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
+            Option option1 = transformToOption(config, relevantParams.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
             if (option1 != null && !option1.toString().contains(":") && !option1.toString().equals(EMPTY_VALUE)) {
                 if (option1 != null) {
                     log.debug("check option: [" + option1 + "]");
@@ -250,7 +248,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
      */
     @Override
     public List getConfigurationItemTypes() {
-        final List configurationItemTypes = EasyList.build(JiraUtils.loadComponent(DefaultValueConfigItem.class));
+        final List configurationItemTypes = Lists.newArrayList(JiraUtils.loadComponent(DefaultValueConfigItem.class));
         configurationItemTypes.add(new SettableMultiLevelOptionsConfigItem4(optionsManager));
         return configurationItemTypes;
     }
@@ -271,27 +269,8 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
      */
     @Override
     public Map<String, Object> getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-        System.out.println("Are we here?");
-        Map map = super.getVelocityParameters(issue, field, fieldLayoutItem);
+        Map<String, Object> map = super.getVelocityParameters(issue, field, fieldLayoutItem);
         map.put("mlcscftype", this);
-
-        //mi creo ArrayList con gli id delle option
-
-
-        Map<String, Option> valueFromIssue = this.getValueFromIssue(field, issue);
-        Map<Long, Option> id2option = new HashMap<Long, Option>();
-        ArrayList<Long> selectedIds = new ArrayList<Long>(valueFromIssue.size());
-        for (int i = 0; i < valueFromIssue.size(); i++) {
-            Option currentOption = valueFromIssue.get("" + i);
-            if (currentOption != null) {
-                Long currentOptionId = currentOption.getOptionId();
-                selectedIds.add(i, currentOptionId);
-                id2option.put(currentOptionId, currentOption);
-            }
-        }
-        map.put("id2option", id2option);
-        map.put("selectedIds", selectedIds);
-        map.put("fieldLayout", fieldLayoutItem);
         return map;
     }
 
@@ -302,27 +281,32 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
      */
     public Map<String, Option> getValueFromIssue(CustomField field, Issue issue) {
         Option parentOption = getOptionValueForParentId(field, null, issue);
-        Map<String, Option> options = new HashMap<String, Option>();
-        options.put("" + 0, parentOption);
-        int i = 1;
-        while (parentOption != null) {
-            Option childOption = getOptionValueForParentId(field, parentOption.getOptionId().toString(), issue);
 
-            if (childOption != null) {
-                options.put("" + i, childOption);
-                i++;
-                parentOption = childOption;
-            } else
-                break;
+        if (parentOption != null) {
+            Map<String, Option> options = new HashMap<String, Option>();
+            options.put("0", parentOption);
+
+            int i = 1;
+            while (true) {
+                Option childOption = getOptionValueForParentId(field, parentOption.getOptionId().toString(), issue);
+
+                if (childOption != null) {
+                    options.put("" + i, childOption);
+                    i++;
+                    parentOption = childOption;
+                } else {
+                    break;
+                }
+            }
+            return options;
+        } else {
+            return null;
         }
-        return options;
     }
 
-    private Option getOptionValueForParentId(CustomField field, String sParentOptionId, Issue issue) {
-        Collection values;
-
-        values = customFieldValuePersister.getValues(field, issue.getId(), CASCADE_VALUE_TYPE, sParentOptionId);
-
+    @Nullable
+    private Option getOptionValueForParentId(CustomField field, @Nullable String sParentOptionId, Issue issue) {
+        Collection values = customFieldValuePersister.getValues(field, issue.getId(), CASCADE_VALUE_TYPE, sParentOptionId);
 
         if (values != null && !values.isEmpty()) {
             String optionId = (String) values.iterator().next();
@@ -356,7 +340,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
 
         int count = params.getAllKeys().size();
         for (int i = 0; i < count; i++) {
-            Option option1 = trasformToOption(null, params.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
+            Option option1 = transformToOption(null, params.getFirstValueForKey(i == 0 ? null : String.valueOf(i)));
             if (option1 != null && !option1.toString().contains(":") && !option1.toString().equals(EMPTY_VALUE)) {
                 if (option1 != null) {
                     log.debug("check option: [" + option1 + "]");
@@ -369,13 +353,8 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
         return options;
     }
 
-    /**
+    /*
      * forse inutile fare l'override, vediamo
-     *
-     * @param key
-     * @param relevantParams
-     * @return
-     * @throws FieldValidationException
      */
     private Option extractOptionFromParams(String key, CustomFieldParams relevantParams) throws FieldValidationException {
         Collection<String> params = relevantParams.getValuesForKey(key);
@@ -390,22 +369,18 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
     }
 
 
-    /**
-     * trasforms the object(Option) in input in an Option.
+    /*
+     * transforms the object(Option) in input in an Option.
      * Ok 5.0
-     *
-     * @param value
-     * @param object
-     * @return
      */
-    private Option trasformToOption(FieldConfig config, Object value) {
+    private Option transformToOption(FieldConfig config, Object value) {
         if (value instanceof Option) {
             return (Option) value;
         }
         if (value instanceof String && EMPTY_VALUE_ID.equals(value)) {
             return this.optionsManager.createOption(config, EMPTY_VALUE_ID_LONG, EMPTY_VALUE_ID_LONG, EMPTY_VALUE);
-        } else if (value instanceof String && !"-1".equals(value)) {
-            return (Option) this.getSingularObjectFromString((String) value);
+        } else if (value instanceof String && !"-1".equals(value) && !"-3".equals(value)) {
+            return this.getSingularObjectFromString((String) value);
         }
         return null;
     }
@@ -439,7 +414,7 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
 
             int count = params.getAllKeys().size();
             for (int i = 0; i < count; i++) {
-                Option option = trasformToOption(null, params.getFirstValueForKey(String.valueOf(i)));
+                Option option = transformToOption(null, params.getFirstValueForKey(String.valueOf(i)));
                 if (option != null) {
                     options.put("" + i, option);
                 }
