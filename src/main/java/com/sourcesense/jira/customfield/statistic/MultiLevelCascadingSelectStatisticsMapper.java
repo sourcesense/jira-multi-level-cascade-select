@@ -8,7 +8,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
-import com.atlassian.jira.ComponentManager;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.customfields.CustomFieldSearcher;
 import com.atlassian.jira.issue.customfields.manager.OptionsManager;
@@ -74,8 +74,8 @@ public class MultiLevelCascadingSelectStatisticsMapper extends AbstractCustomFie
     } else {
       if (value != null) {
         log.debug("VALUE:" + ((MultiLevelCascadingSelectValue) value).getSearchValue());
-        final SearchService searchService = ComponentManager.getComponentInstanceOfType(SearchService.class);
-        final User user = ComponentManager.getInstance().getJiraAuthenticationContext().getUser();
+        final SearchService searchService = ComponentAccessor.getComponentOfType(SearchService.class);
+        final User user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
         SearchContext searchRequestContext = searchService.getSearchContext(user, searchRequest.getQuery());
         SearchContext possibleContext = getSearchContextFromValue(value);
         log.debug("possible : " + possibleContext.toString());

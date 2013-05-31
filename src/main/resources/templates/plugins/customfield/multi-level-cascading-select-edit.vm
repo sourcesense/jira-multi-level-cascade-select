@@ -1,7 +1,7 @@
 #if (!$request || !$request.getAttribute("multilevelcascade"))
-$!request.setAttribute("multilevelcascade" , "true")
-## @TODO Somewhat of a hack should move when fields is refactored.
-    <script language="JavaScript" type="text/javascript" src="$!{request.contextPath}/includes/js/multilevelcascadingUtil.js"></script>
+	$!request.setAttribute("multilevelcascade" , "true")
+	## @TODO Somewhat of a hack should move when fields is refactored.
+	    <script type="text/javascript" src="$!{request.contextPath}/includes/js/multilevelcascadingUtil.js"></script>
 #end
 
 #controlHeader ($action $customField.id $customField.name $fieldLayoutItem.required $displayParameters.noHeader)
@@ -84,9 +84,9 @@ $!request.setAttribute("multilevelcascade" , "true")
                 #set($selectedValue = "-1")
             #end
             #if ($selectedId == 0)
-                MLCS.selectOption('select#${customField.id}', '${selectedValue}');
+                selectOption('select#${customField.id}', '${selectedValue}');
             #else
-                MLCS.selectOption('select#${customField.id}\\:$!selectedId', '${selectedValue}');
+                selectOption('select#${customField.id}\\:$!selectedId', '${selectedValue}');
             #end
         #end
     #end

@@ -6,7 +6,7 @@
 <head>
 	<title><webwork:text name="'admin.issuefields.customfields.edit.options'"/></title>
 </head>
-<script language="JavaScript">
+<script language="text/javascript">
 <!--
 function loadUri(optionId)
 {

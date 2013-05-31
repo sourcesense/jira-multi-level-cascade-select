@@ -13,6 +13,14 @@
         <list>true</list>
     </jql-function>
 
+	<web-resource name="Resources" key="resources">
+		<resource type="download" name="multilevelcascadingUtil.js" location="includes/js/multilevelcascadingUtil.js">
+			<property key="content-type" value="text/javascript" />
+		</resource>
+		<context>atl.general</context>
+		<context>atl.popup</context>
+	</web-resource>
+
     <customfield-type key="multi-level-cascading-select" name="Multi-Level Cascading Select"
                       class="com.sourcesense.jira.customfield.type.MultiLevelCascadingSelectCFType">
         <description>Cascading select list supporting more than two levels.</description>

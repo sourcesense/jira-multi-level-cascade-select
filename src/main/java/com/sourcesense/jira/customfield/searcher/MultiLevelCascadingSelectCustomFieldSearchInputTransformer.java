@@ -255,7 +255,7 @@ public class MultiLevelCascadingSelectCustomFieldSearchInputTransformer extends 
     if (value.equals(EMPTY_VALUE_ID))
       return value;
     else
-      return selectConverter.getObject(value);
+      return selectConverter.getObject(value).getValue();
   }
 
   // /CLOVER:OFF
