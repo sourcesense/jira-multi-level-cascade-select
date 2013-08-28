@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.atlassian.jira.util.ObjectUtils;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.context.IssueContext;
 import com.atlassian.jira.issue.customfields.config.item.DefaultValueConfigItem;
@@ -253,10 +254,18 @@ public class MultiLevelCascadingSelectCFType extends CascadingSelectCFType {
         return configurationItemTypes;
     }
 
-    public OptionsMap getOptionMapFromOptions(Options options) {
-
-        return new OptionsMap(options);
-    }
+    public OptionsMap getOptionMapFromOptions(List<Option> optionList) {
+        
+        Options options = null;
+        if (!optionList.isEmpty()) {
+            FieldConfig fieldConfig = optionList.get(0).getRelatedCustomField();
+            if (!ComponentAccessor.getOptionsManager().getOptions(fieldConfig).isEmpty()) {
+                options = ComponentAccessor.getOptionsManager().getOptions(fieldConfig);
+            }
+        }
+        
+      return new OptionsMap(options);
+  }
 
     /**
      * return the velocity parameter for the issue and custom field in input no woking for bugged

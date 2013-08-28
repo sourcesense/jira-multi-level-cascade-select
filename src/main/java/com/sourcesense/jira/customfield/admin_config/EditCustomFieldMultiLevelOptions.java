@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import webwork.action.Action;
 import webwork.action.ActionContext;
 
+import com.atlassian.jira.config.managedconfiguration.ManagedConfigurationItemService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueImpl;
 import com.atlassian.jira.issue.IssueManager;
@@ -68,14 +69,18 @@ public class EditCustomFieldMultiLevelOptions extends AbstractEditConfigurationI
   private final IssueManager issueManager;
 
   private final OptionsManager optionsManager;
+  
+  
 
   // ----------------------------------------------------------------------------------------------------
   // Constructors
-  public EditCustomFieldMultiLevelOptions(IssueManager issueManager, OptionsManager optionsManager) {
-    this.issueManager = issueManager;
-    this.optionsManager = optionsManager;
-    this.hlFields = new LinkedList<String>();
-  }
+  public EditCustomFieldMultiLevelOptions(IssueManager issueManager, OptionsManager optionsManager,
+                    ManagedConfigurationItemService managedConfigurationItemService) {
+        super(managedConfigurationItemService);
+        this.issueManager = issueManager;
+        this.optionsManager = optionsManager;
+        this.hlFields = new LinkedList<String>();
+    }
 
   // --------------------------------------------------------------------------------------------------
   // Action Methods
@@ -90,7 +95,8 @@ public class EditCustomFieldMultiLevelOptions extends AbstractEditConfigurationI
     return super.doDefault();
   }
 
-  @Override
+
+@Override
   protected void doValidation() {
     if (getCustomField() == null) {
       addErrorMessage(getText("admin.errors.customfields.no.field.selected.for.edit"));

@@ -47,7 +47,7 @@ $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
         #if ($customList.get($key))
             #renderSelect ($key ${customField.id} $customList)
             #if ($id > 1)
-                #set ($script = "$!script MLCS.dynamicSelect('search-${customField.id}\\:$prevkey', 'search-${customField.id}\\:$key');")
+                #set ($script = "$!script dynamicMultiLevelSelect('search-${customField.id}\\:$prevkey', 'search-${customField.id}\\:$key');")
             #end
         #end
         #set ($prevkey = $key)
@@ -57,11 +57,11 @@ $!{auiparams.put("controlHeaderClass", "aui-field-multicascadingselect")}
 #searcherEditFooter ($customField.id $customField.description)
 $!{auiparams.clear()}
 <script>
-    MLCS.dynamicSelect('search-${customField.id}', 'search-${customField.id}\\:1');
+    dynamicMultiLevelSelect('search-${customField.id}', 'search-${customField.id}\\:1');
     $!script
 
     #if ($value.getFirstValueForKey(null))
-        MLCS.selectOption('select#search-${customField.id}', '${value.getFirstValueForKey(null)}');
+        selectOption('select#search-${customField.id}', '${value.getFirstValueForKey(null)}');
 
         #if ($numLevels >= 1)
             #foreach ($selectedId in [1..$numLevels])
@@ -70,10 +70,10 @@ $!{auiparams.clear()}
                 #else
                     #set($selectedValue = "-1")
                 #end
-                MLCS.selectOption('select#search-${customField.id}\\:$!selectedId', '${selectedValue}');
+                selectOption('select#search-${customField.id}\\:$!selectedId', '${selectedValue}');
             #end
         #end
     #else
-        MLCS.selectOption('select#search-${customField.id}', '-1');
+        selectOption('select#search-${customField.id}', '-1');
     #end
 </script>
